@@ -23,7 +23,7 @@ public class PolynomialChainView extends LinearLayout {
     protected final static String PARCELABLE_POLYNOMIAL_LIST_KEY = "polynomialList";
 
     protected float textSize = 20;
-    protected static final ArrayList<TextView> unusedTextViews = new ArrayList<>();
+    protected static final ArrayList<TextView> unusedTextViews = new ArrayList<TextView>();
     private final ArrayList<TextView> usedTextViews;
     protected final ArrayList<PolynomialView> list;
 
@@ -53,8 +53,8 @@ public class PolynomialChainView extends LinearLayout {
 
     public PolynomialChainView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.list = new ArrayList<>();
-        this.usedTextViews = new ArrayList<>();
+        this.list = new ArrayList<PolynomialView>();
+        this.usedTextViews = new ArrayList<TextView>();
         this.setOne();
 
         init(attrs);

@@ -36,7 +36,7 @@ public class HistoryHelper {
 
         public static ArrayList<Bundle> getHistory(Context context){
             InputStream input;
-            ArrayList<Bundle> history = new ArrayList<>();
+            ArrayList<Bundle> history = new ArrayList<Bundle>();
             try {
                 input = context.openFileInput(HISTORY_FILE);
             } catch (FileNotFoundException e) {
@@ -141,7 +141,7 @@ public class HistoryHelper {
             throws XmlPullParserException, IOException {
         if (parser.getEventType() != XmlPullParser.START_TAG)
             return null;
-        ArrayList<Bundle> polynomials = new ArrayList<>();
+        ArrayList<Bundle> polynomials = new ArrayList<Bundle>();
         int event = parser.next();
         while (!(event == XmlPullParser.END_TAG &&
                 (parser.getName().equals(XML_DENOMINATOR_CHAIN) ||
@@ -168,7 +168,7 @@ public class HistoryHelper {
         if (parser.getEventType() != XmlPullParser.START_TAG
                 || !parser.getName().equals(XML_POLYNOMIAL))
             return null;
-        ArrayList<Bundle> elements = new ArrayList<>();
+        ArrayList<Bundle> elements = new ArrayList<Bundle>();
         int event = parser.next();
         while (!(event == XmlPullParser.END_TAG && parser.getName().equals(
         XML_POLYNOMIAL))) {
@@ -251,7 +251,7 @@ public class HistoryHelper {
             content = sb.toString();
             String startTag = '<' + XML_TRANSFER_FUNCTION + '>';
             int startTagPosition = 0;
-            ArrayList<Integer> startTagPositions = new ArrayList<>(MAX_HISTORY_LENGTH);
+            ArrayList<Integer> startTagPositions = new ArrayList<Integer>(MAX_HISTORY_LENGTH);
             while(startTagPosition != -1){
                 startTagPositions.add(startTagPosition);
                 startTagPosition = content.indexOf(startTag, startTagPosition + startTag.length());
@@ -355,7 +355,7 @@ public class HistoryHelper {
             content = sb.toString();
             String startTag = '<' + XML_TRANSFER_FUNCTION + '>';
             int startTagPosition = 0;
-            ArrayList<Integer> startTagPositions = new ArrayList<>(MAX_HISTORY_LENGTH);
+            ArrayList<Integer> startTagPositions = new ArrayList<Integer>(MAX_HISTORY_LENGTH);
             while(startTagPosition != -1){
                 startTagPositions.add(startTagPosition);
                 startTagPosition = content.indexOf(startTag, startTagPosition + startTag.length());

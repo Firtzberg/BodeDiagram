@@ -25,7 +25,7 @@ public abstract class PolynomialBaseView<T extends PolynomialElementBaseView> ex
     public PolynomialBaseView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.setOrientation(HORIZONTAL);
-        list = new ArrayList<>();
+        list = new ArrayList<T>();
     }
 
     protected abstract T getGeneric();

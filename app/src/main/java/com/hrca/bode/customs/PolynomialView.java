@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * Created by Hrvoje on 18.1.2015..
  */
 public class PolynomialView extends PolynomialBaseView<PolynomialElementView> {
-    private static ArrayList<PolynomialView> recycleList = new ArrayList<>();
+    private static ArrayList<PolynomialView> recycleList = new ArrayList<PolynomialView>();
     private PolynomialView(Context context) {
         super(context);
     }

@@ -13,8 +13,7 @@
         android:id="@+id/button"
         android:onClick="reset"
         android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentLeft="true" />
 
     <view
         android:layout_width="match_parent"
@@ -23,8 +22,7 @@
         android:id="@+id/view2"
         android:layout_below="@+id/button"
         android:layout_above="@+id/button4"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentLeft="true" />
 
     <Button
         android:layout_width="wrap_content"
@@ -33,7 +31,6 @@
         android:id="@+id/button3"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
         android:onClick="historyClick" />
 
     <Button

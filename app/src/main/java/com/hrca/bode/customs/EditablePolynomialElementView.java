@@ -15,7 +15,7 @@ import java.util.ArrayList;
  */
 public class EditablePolynomialElementView extends PolynomialElementBaseView<EditText> {
 
-    private static ArrayList<PolynomialElementBaseView<EditText>> recycleList = new ArrayList<>();
+    private static ArrayList<PolynomialElementBaseView<EditText>> recycleList = new ArrayList<PolynomialElementBaseView<EditText>>();
 
     private EditablePolynomialElementView(Context context) {
         this(context, null);

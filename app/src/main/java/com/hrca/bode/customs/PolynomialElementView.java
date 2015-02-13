@@ -11,7 +11,7 @@ import java.util.ArrayList;
  */
 public class PolynomialElementView extends PolynomialElementBaseView<TextView> {
 
-    private static ArrayList<PolynomialElementBaseView<TextView>> recycleList = new ArrayList<>();
+    private static ArrayList<PolynomialElementBaseView<TextView>> recycleList = new ArrayList<PolynomialElementBaseView<TextView>>();
 
     private PolynomialElementView(Context context) {
         this(context, null);
