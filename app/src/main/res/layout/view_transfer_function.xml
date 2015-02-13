@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tf_container">
+
+        <TextView
+            android:id="@+id/gain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"/>
+
+        <view
+            android:id="@+id/astatism"
+            class="com.hrca.bode.customs.AstatismView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/gain"
+            android:layout_toRightOf="@+id/gain"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/astatism"
+            android:layout_toRightOf="@+id/astatism"
+    android:orientation="vertical">
+
+            <view
+                android:id="@+id/numerator_chain"
+                class="com.hrca.bode.customs.PolynomialChainView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal" />
+
+            <View
+                android:id="@+id/fraction_bar"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#000" />
+
+            <view
+                android:id="@+id/denominator_chain"
+                class="com.hrca.bode.customs.PolynomialChainView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal" />
+        </LinearLayout>
+        </RelativeLayout>
