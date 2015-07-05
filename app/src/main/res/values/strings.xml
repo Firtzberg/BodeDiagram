@@ -7,5 +7,7 @@
     <string name="title_activity_history">History</string>
     <string name="title_activity_polinomial">PolinomialActivity</string>
     <string name="title_activity_result">ResultActivity</string>
+    <string name="decrease_astatism">Decrease astatism</string>
+    <string name="increase_astatism">Increase astatism</string>
 
 </resources>

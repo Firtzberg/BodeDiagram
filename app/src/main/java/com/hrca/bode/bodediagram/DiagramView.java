@@ -1,6 +1,7 @@
 package com.hrca.bode.bodediagram;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -21,14 +22,15 @@ import org.ejml.data.Complex64F;
  * TODO: document your custom view class.
  */
 public class DiagramView extends SurfaceView {
-    private static final float PIXELS_PER_DECADE = 60;
-    private static final float PIXELS_PER_DB = 2.5F;
-    private static final float PIXELS_PER_DEGREE = 50/90F;
-    private static final float PIXELS_LEFT_PADDING = 50;
-    private static final float PIXELS_TOP_PADDING = 20;
-    private static final float PIXELS_RIGHT_PADDING = 20;
-    private static final float PIXELS_BOTTOM_PADDING = 20;
-    private static final float PIXELS_BETWEEN_DIAGRAMS = 15;
+    private static final float DENSITY_COEFFICIENT = Resources.getSystem().getDisplayMetrics().density;
+    private static final float PIXELS_PER_DECADE = 60 * DENSITY_COEFFICIENT;
+    private static final float PIXELS_PER_DB = 2.5F * DENSITY_COEFFICIENT;
+    private static final float PIXELS_PER_DEGREE = 50/90F * DENSITY_COEFFICIENT;
+    private static final float PIXELS_LEFT_PADDING = 50 * DENSITY_COEFFICIENT;
+    private static final float PIXELS_TOP_PADDING = 20 * DENSITY_COEFFICIENT;
+    private static final float PIXELS_RIGHT_PADDING = 20 * DENSITY_COEFFICIENT;
+    private static final float PIXELS_BOTTOM_PADDING = 20 * DENSITY_COEFFICIENT;
+    private static final float PIXELS_BETWEEN_DIAGRAMS = 15 * DENSITY_COEFFICIENT;
     private static final double FREQUENCY_DENSITY = 10;
     private static final float linesLength = 5;
     private static final float LINES_DENSITY_DB = 20;
@@ -38,7 +40,8 @@ public class DiagramView extends SurfaceView {
     private static final int COLOR_DEFAULT_AXIS = Color.BLACK;
     private static final int COLOR_DEFAULT_CURVE = Color.BLUE;
     private static final int COLOR_DEFAULT_TEXT = Color.BLACK;
-    private static final float SIZE_DEFAULT_TEXT = 12;
+    private static final float SIZE_DEFAULT_TEXT = 12 * Resources.getSystem().getDisplayMetrics().scaledDensity;
+    private static final float RELATIVE_CURVE_THICKNESS = 1.5F;
     double[] numeratorVector;
     double[] denominatorVector;
     int astatism;
@@ -63,9 +66,13 @@ public class DiagramView extends SurfaceView {
         super(context, attrs);
 
         this.linesPaint = new Paint();
+        this.linesPaint.setStrokeWidth(DENSITY_COEFFICIENT);
         this.axisPaint = new Paint();
+        this.axisPaint.setStrokeWidth(DENSITY_COEFFICIENT);
         this.curvePaint = new Paint();
+        this.curvePaint.setStrokeWidth(RELATIVE_CURVE_THICKNESS * DENSITY_COEFFICIENT);
         this.textPaint = new Paint();
+        this.textPaint.setStrokeWidth(DENSITY_COEFFICIENT);
 
         init(attrs);
     }

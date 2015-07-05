@@ -26,24 +26,6 @@ public class InputActivity extends Activity {
         setContentView(R.layout.activity_input);
         this.transferFunctionView = (EditableTransferFunctionView) findViewById(R.id.view2);
 
-        this.transferFunctionView.addNumeratorButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent();
-                i.setClass(InputActivity.this, PolynomialActivity.class);
-                i.putExtra(EXTRA_POLYNOMIAL_CHAIN_IDENTIFIER, true);
-                startActivityForResult(i, REQUEST_CODE_EDIT_POLYNOMIAL);
-            }
-        });
-        this.transferFunctionView.addDenominatorButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent();
-                i.setClass(InputActivity.this, PolynomialActivity.class);
-                i.putExtra(EXTRA_POLYNOMIAL_CHAIN_IDENTIFIER, false);
-                startActivityForResult(i, REQUEST_CODE_EDIT_POLYNOMIAL);
-            }
-        });
         this.transferFunctionView.setOnPolynomialClickListener(new EditableTransferFunctionView.OnPolynomialClickListener() {
             @Override
             public void onPolynomialClick(boolean numerator, int identifier, Parcelable savedInstanceState) {
@@ -56,7 +38,21 @@ public class InputActivity extends Activity {
             }
         });
         this.transferFunctionView.setTextSize(20);
-}
+    }
+
+    public void addNumeratorButtonClick(View v) {
+        Intent i = new Intent();
+        i.setClass(InputActivity.this, PolynomialActivity.class);
+        i.putExtra(EXTRA_POLYNOMIAL_CHAIN_IDENTIFIER, true);
+        startActivityForResult(i, REQUEST_CODE_EDIT_POLYNOMIAL);
+    }
+
+    public void addDenominatorButtonClick(View v) {
+        Intent i = new Intent();
+        i.setClass(InputActivity.this, PolynomialActivity.class);
+        i.putExtra(EXTRA_POLYNOMIAL_CHAIN_IDENTIFIER, false);
+        startActivityForResult(i, REQUEST_CODE_EDIT_POLYNOMIAL);
+    }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState){

@@ -14,9 +14,11 @@
     </declare-styleable>
     <declare-styleable name="PolynomialChainView">
     </declare-styleable>
-    <declare-styleable name="TransferFunctionView">
+    <declare-styleable name="TransferFunctionBaseView">
         <attr name="gain" format="float" />
         <attr name="tf_astatism" format="integer" />
+    </declare-styleable>
+    <declare-styleable name="TransferFunctionView">
     </declare-styleable>
     <declare-styleable name="EditableTransferFunctionView">
     </declare-styleable>
