@@ -152,8 +152,9 @@ public class ResultActivity extends Activity {
             minFrequency = (float)Math.log10(minFrequency);
             maxFrequency = (float)Math.log10(maxFrequency);
 
-            this.formattedTransferFunction.setGain(gain);
             this.formattedTransferFunction.setAstatism(astatism);
+            this.formattedTransferFunction.adjustMainFractalVisibility();
+            this.formattedTransferFunction.setGain(gain);
         }
     }
 

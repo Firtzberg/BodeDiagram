@@ -6,15 +6,29 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".InputActivity">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Reset"
+    <ImageButton
+        android:layout_width="@dimen/image_button_size"
+        android:layout_height="@dimen/image_button_size"
+        android:contentDescription="Reset"
+        android:scaleType="fitCenter"
+        android:src="@drawable/reset"
         android:id="@+id/button"
         android:onClick="reset"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
+    <ImageButton
+        android:layout_width="@dimen/image_button_size"
+        android:layout_height="@dimen/image_button_size"
+        android:src="@drawable/history"
+        android:id="@+id/button3"
+        android:scaleType="fitCenter"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:contentDescription="@string/delete_history"
+        android:onClick="historyClick" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -60,20 +74,12 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="History"
-        android:id="@+id/button3"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:onClick="historyClick" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SHOW BODE"
+    <ImageButton
+        android:layout_width="150dp"
+        android:layout_height="60dp"
+        android:scaleType="fitCenter"
+        android:contentDescription="Show Bode"
+        android:src="@drawable/check"
         android:id="@+id/button4"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"

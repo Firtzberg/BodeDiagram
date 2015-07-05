@@ -11,9 +11,6 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
 
 import org.ejml.data.Complex64F;
 
@@ -33,8 +30,8 @@ public class DiagramView extends SurfaceView {
     private static final float PIXELS_BETWEEN_DIAGRAMS = 15 * DENSITY_COEFFICIENT;
     private static final double FREQUENCY_DENSITY = 10;
     private static final float linesLength = 5;
-    private static final float LINES_DENSITY_DB = 20;
-    private static final float LINES_DENSITY_DEGREES = 45;
+    private static final float AMPLITUDE_STEP_DB = 20;
+    private static final float PHASE_STEP_DEGREES = 45;
     private static final int COLOR_DEFAULT_BACKGROUND = Color.WHITE;
     private static final int COLOR_DEFAULT_LINES = Color.LTGRAY;
     private static final int COLOR_DEFAULT_AXIS = Color.BLACK;
@@ -128,12 +125,19 @@ public class DiagramView extends SurfaceView {
         double phase;
         double[] phases = new double[frequencies.length];
         Complex64F value;
+        double m;
         for(int i = 0; i < frequencies.length; i++){
             value = calculatePolynomialValue(frequencies[i], this.numeratorVector);
             amplitude = value.getMagnitude();
             phase = Math.atan2(value.imaginary, value.real);
             value = calculatePolynomialValue(frequencies[i], this.denominatorVector);
-            amplitude /= value.getMagnitude();
+            m = value.getMagnitude();
+            if(m == 0) {
+                amplitude = Double.POSITIVE_INFINITY;
+            }
+            else{
+                amplitude /= value.getMagnitude();
+            }
             phase -= Math.atan2(value.imaginary, value.real);
             phase *= 180/Math.PI;
             amplitude *= Math.pow(frequencies[i], this.astatism);
@@ -142,9 +146,12 @@ public class DiagramView extends SurfaceView {
                 phase += 180;
                 amplitude = -amplitude;
             }
-            phase -= Math.floor((phase + 270)/360)*360;
+            //phase -= Math.floor((phase + 270) / 360)*360;
 
             amplitude = 20*Math.log10(amplitude);
+            if(Double.isInfinite(amplitude)){
+                amplitude = amplitudes[i-1];
+            }
             amplitudes[i] = amplitude;
             if(amplitude > maxAmplitude)
                 maxAmplitude = amplitude;
@@ -159,8 +166,12 @@ public class DiagramView extends SurfaceView {
 
             frequencies[i] = Math.log10(frequencies[i]);
         }
+        this.maxAmplitude = Math.ceil(this.maxAmplitude / AMPLITUDE_STEP_DB) * AMPLITUDE_STEP_DB;
+        this.minAmplitude = Math.floor(this.minAmplitude / AMPLITUDE_STEP_DB) * AMPLITUDE_STEP_DB;
+        this.maxPhase = Math.ceil(this.maxPhase / PHASE_STEP_DEGREES) * PHASE_STEP_DEGREES;
+        this.minPhase = Math.floor(this.minPhase / PHASE_STEP_DEGREES) * PHASE_STEP_DEGREES;
         end = System.currentTimeMillis();
-        Log.d("Time", "Izracuni zavrseni za " + Long.toString(end - time) + " milisekundi");
+        Log.d("Time", "Calculation time: " + Long.toString(end - time) + " milisekunds");
         time = end;
         View parent = (View)this.getParent();
         this.getLayoutParams().height = (int)getPhaseY(this.minPhase) + (int)PIXELS_BOTTOM_PADDING;
@@ -170,7 +181,7 @@ public class DiagramView extends SurfaceView {
         parent.requestLayout();
         SurfaceHolder sh = this.getHolder();
         Canvas canvas = null;
-        Log.d("Javljanje", "Cekam na canvas");
+        Log.d("Meanwhile", "Waiting for canvas");
         try {
             Thread.sleep(20);
             while((canvas = sh.lockCanvas()) == null) {
@@ -180,40 +191,38 @@ public class DiagramView extends SurfaceView {
             e.printStackTrace();
         }
         end = System.currentTimeMillis();
-        Log.d("Time", "Docekan canvas za " + Long.toString(end - time) + " milisekundi");
+        Log.d("Time", "Waiten for canvas: " + Long.toString(end - time) + " milisekunds");
         time = end;
-        Log.d("Javaljanje", "Docekao sam canvas");
         canvas.drawColor(backgroundColor);
         drawAmplitudeVerticals(canvas);
         end = System.currentTimeMillis();
-        Log.d("Time", "Amplitudne vertikale za " + Long.toString(end - time) + " milisekundi");
+        Log.d("Time", "Amplitudn verticals drawn in " + Long.toString(end - time) + " milisekunds");
         time = end;
         drawAmplitudeHorizontals(canvas);
         end = System.currentTimeMillis();
-        Log.d("Time", "Amplitudne horizontale za " + Long.toString(end - time) + " milisekundi");
+        Log.d("Time", "Amplitudne horizontals drawn in " + Long.toString(end - time) + " milisekunds");
         time = end;
         drawAmplitudeAxis(canvas);
         end = System.currentTimeMillis();
-        Log.d("Time", "Amplitudne osi za " + Long.toString(end - time) + " milisekundi");
+        Log.d("Time", "Amplitude axises drawn in " + Long.toString(end - time) + " milisekunds");
         time = end;
         drawPhaseHorizontals(canvas);
         end = System.currentTimeMillis();
-        Log.d("Time", "Fazne horizontale za " + Long.toString(end - time) + " milisekundi");
+        Log.d("Time", "Phase horzontals drawn in " + Long.toString(end - time) + " milisekunds");
         time = end;
         drawPhaseVerticals(canvas);
         end = System.currentTimeMillis();
-        Log.d("Time", "Fazne vertikale za " + Long.toString(end - time) + " milisekundi");
+        Log.d("Time", "Phase verticals drawn in " + Long.toString(end - time) + " milisekunds");
         time = end;
         drawPhaseAxis(canvas);
         end = System.currentTimeMillis();
-        Log.d("Time", "Fazne osi za " + Long.toString(end - time) + " milisekundi");
+        Log.d("Time", "Phase axises drawn in " + Long.toString(end - time) + " milisekunds");
         time = end;
         drawCurves(canvas, frequencies, amplitudes, phases);
         end = System.currentTimeMillis();
-        Log.d("Time", "Krivulje nacrtane za " + Long.toString(end - time) + " milisekundi");
-        Log.d("Time", "Ukupno vrijeme crtanja " + Long.toString(end - startTime) + " milisekundi");
+        Log.d("Time", "Curves drawn in " + Long.toString(end - time) + " milisekunds");
+        Log.d("Time", "Total drawing time " + Long.toString(end - startTime) + " milisekunds");
         sh.unlockCanvasAndPost(canvas);
-        Log.d("Javaljanje", "Zavrseno");
     }
 
     private double[] getFrequencies(){
@@ -232,9 +241,9 @@ public class DiagramView extends SurfaceView {
         float x;
         float width = getX(this.maxFrequency) - getX(this.minFrequency);
         float[] pts = new float[4*(int)(width/linesLength/2)];
-        float current = (int)Math.floor(this.minAmplitude/ LINES_DENSITY_DB)* LINES_DENSITY_DB;
+        float current = (int)Math.floor(this.minAmplitude/ AMPLITUDE_STEP_DB)* AMPLITUDE_STEP_DB;
         if(current < this.minAmplitude)
-            current += LINES_DENSITY_DB;
+            current += AMPLITUDE_STEP_DB;
         while(current <= this.maxAmplitude) {
             y = getAmplitudeY(current);
             x = getX(this.minFrequency);
@@ -246,7 +255,7 @@ public class DiagramView extends SurfaceView {
                 pts[4*i + 3] = y;
             }
             canvas.drawLines(pts, linesPaint);
-            current += LINES_DENSITY_DB;
+            current += AMPLITUDE_STEP_DB;
         }
     }
 
@@ -255,9 +264,9 @@ public class DiagramView extends SurfaceView {
         float x;
         float width = getX(this.maxFrequency) - getX(this.minFrequency);
         float[] pts = new float[4*(int)(width/linesLength/2)];
-        float current = (int)Math.floor(this.minPhase/ LINES_DENSITY_DEGREES)* LINES_DENSITY_DEGREES;
+        float current = (int)Math.floor(this.minPhase/ PHASE_STEP_DEGREES)* PHASE_STEP_DEGREES;
         if(current < this.minPhase)
-            current += LINES_DENSITY_DEGREES;
+            current += PHASE_STEP_DEGREES;
         while(current <= this.maxPhase) {
             y = getPhaseY(current);
             x = getX(this.minFrequency);
@@ -269,7 +278,7 @@ public class DiagramView extends SurfaceView {
                 pts[4*i + 3] = y;
             }
             canvas.drawLines(pts, linesPaint);
-            current += LINES_DENSITY_DEGREES;
+            current += PHASE_STEP_DEGREES;
         }
     }
 

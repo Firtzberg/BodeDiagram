@@ -17,13 +17,20 @@
         android:id="@+id/original"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/equals"
+        android:layout_below="@+id/original"
+        android:layout_centerHorizontal="true"
+        android:text="="/>
 
     <view
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         class="com.hrca.bode.customs.TransferFunctionView"
         android:id="@+id/formatted"
-        android:layout_below="@+id/original"
+        android:layout_below="@+id/equals"
         android:layout_centerHorizontal="true" />
 <HorizontalScrollView
     android:layout_width="match_parent"

@@ -9,5 +9,6 @@
     <string name="title_activity_result">ResultActivity</string>
     <string name="decrease_astatism">Decrease astatism</string>
     <string name="increase_astatism">Increase astatism</string>
+    <string name="delete_history">Delete History</string>
 
 </resources>
