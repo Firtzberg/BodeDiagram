@@ -112,9 +112,9 @@ public class InputActivity extends Activity {
         if(requestCode == REQUEST_CODE_DISPLAY) {
             if(data != null){
                 new AlertDialog.Builder(this)
-                        .setTitle("Wrong input")
                         .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setMessage(data.getIntExtra(EXTRA_DISPLAY_ERROR_MESSAGE_R_ID, R.string.hello_world))
+                        .setPositiveButton(android.R.string.ok, null)
+                        .setMessage(data.getIntExtra(EXTRA_DISPLAY_ERROR_MESSAGE_R_ID, R.string.numerator_zero))
                         .show();
             }
         }

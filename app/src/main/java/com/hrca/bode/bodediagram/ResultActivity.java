@@ -15,6 +15,8 @@ import org.ejml.interfaces.decomposition.EigenDecomposition;
 import java.util.ArrayList;
 
 public class ResultActivity extends Activity {
+    public static final String PARCELABLE_FORMATTED_TF = "formatedTF";
+    public static final String PARCELABLE_ORIGINAL_TF = "originalTF";
     protected TransferFunctionView originalTransferFunction;
     protected TransferFunctionView formattedTransferFunction;
     protected DiagramView diagram;
@@ -56,7 +58,7 @@ public class ResultActivity extends Activity {
 
             double gain = this.originalTransferFunction.getGain();
             if(gain == 0) {
-                finishWithError(R.string.hello_world);
+                finishWithError(R.string.gain_zero);
                 return;
             }
 
@@ -69,7 +71,7 @@ public class ResultActivity extends Activity {
             PolynomialChainParameters numeratorParameters =
                     AnalysePolynomialChain(this.originalTransferFunction.getNumeratorCoefficientArrays());
             if(numeratorParameters.gain == 0) {
-                finishWithError(R.string.hello_world);
+                finishWithError(R.string.numerator_zero);
                 return;
             }
             gain *= numeratorParameters.gain;
@@ -80,7 +82,7 @@ public class ResultActivity extends Activity {
             PolynomialChainParameters denominatorParameters =
                     AnalysePolynomialChain(this.originalTransferFunction.getDenominatorCoefficientArrays());
             if(denominatorParameters.gain == 0) {
-                finishWithError(R.string.hello_world);
+                finishWithError(R.string.denominator_zero);
                 return;
             }
             this.formattedTransferFunction.addDenominatorRoots(denominatorParameters.roots);
@@ -110,6 +112,20 @@ public class ResultActivity extends Activity {
         super.onResume();
         this.diagram.draw(this.formattedTransferFunction.getAstatism(),
                 numeratorVector, denominatorVector, minFrequency, maxFrequency);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putParcelable(PARCELABLE_ORIGINAL_TF, this.originalTransferFunction.onSaveInstanceState());
+        savedInstanceState.putParcelable(PARCELABLE_FORMATTED_TF, this.formattedTransferFunction.onSaveInstanceState());
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        this.originalTransferFunction.onRestoreInstanceState(savedInstanceState.getParcelable(PARCELABLE_ORIGINAL_TF));
+        this.formattedTransferFunction.onRestoreInstanceState(savedInstanceState.getParcelable(PARCELABLE_FORMATTED_TF));
     }
 
     private void finishWithError(int messageIdentifier){
