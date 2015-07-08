@@ -3,6 +3,8 @@ package com.hrca.bode.customs;
 import android.content.Context;
 import android.util.AttributeSet;
 
+import org.ejml.data.Complex64F;
+
 import java.util.ArrayList;
 
 /**
@@ -36,5 +38,43 @@ public class PolynomialView extends PolynomialBaseView<PolynomialElementView> {
         }
         polynomialView = new PolynomialView(context);
         return polynomialView;
+    }
+
+    public void setRoot(Complex64F root){
+        PolynomialElementView element;
+        int elements;
+        if(root.isReal())
+            elements = 2;
+        else elements = 3;
+        while(this.list.size() > elements)
+            this.remove();
+        while(this.list.size() < elements)
+            this.add();
+
+        element = this.list.get(0);
+        element.setShowSign(true);
+        element.setNumerator(1);
+        element.setDenominator(1);
+
+        if(root.isReal()){
+            element = this.list.get(1);
+            element.setShowSign(false);
+            element.setNumerator(1);
+            element.setDenominator((float)-root.getReal());
+        }
+        else {
+            float wn = (float)root.getMagnitude();
+            float zeta = (float)root.real/wn + 1.0F;
+            zeta -= 1.0;
+            element = this.list.get(1);
+            element.setShowSign(true);
+            element.setNumerator(-2 * zeta);
+            element.setDenominator(wn);
+
+            element = this.list.get(2);
+            element.setShowSign(false);
+            element.setNumerator(1);
+            element.setDenominator(wn*wn);
+        }
     }
 }

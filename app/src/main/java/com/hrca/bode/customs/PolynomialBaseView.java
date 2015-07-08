@@ -7,8 +7,6 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 
-import org.ejml.data.Complex64F;
-
 import java.util.ArrayList;
 
 /**
@@ -44,40 +42,6 @@ public abstract class PolynomialBaseView<T extends PolynomialElementBaseView> ex
         list.add(element);
 
         this.addView(element, 0);
-    }
-
-    public void setRoot(Complex64F root){
-        T element;
-        int elements;
-        if(root.isReal())
-            elements = 2;
-        else elements = 3;
-        while(this.list.size() > elements)
-            this.remove();
-        while(this.list.size() < elements)
-            this.add();
-
-        element = this.list.get(0);
-        element.setNumerator(1);
-        element.setDenominator(1);
-
-        if(root.isReal()){
-            element = this.list.get(1);
-            element.setNumerator(1);
-            element.setDenominator((float)-root.getReal());
-        }
-        else {
-            float wn = (float)root.getMagnitude();
-            float zeta = (float)root.real/wn + 1.0F;
-            zeta -= 1.0;
-            element = this.list.get(1);
-            element.setNumerator(-2*zeta);
-            element.setDenominator(wn);
-
-            element = this.list.get(2);
-            element.setNumerator(1);
-            element.setDenominator(wn*wn);
-        }
     }
 
     public double[] getCoefficients(){

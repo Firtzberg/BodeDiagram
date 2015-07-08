@@ -27,7 +27,9 @@ public class EditablePolynomialElementView extends PolynomialElementBaseView<Edi
     }
 
     private void init(AttributeSet attrs){
-        this.numeratorView.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_CLASS_NUMBER);
+        this.numeratorView.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL |
+                InputType.TYPE_CLASS_NUMBER |
+                InputType.TYPE_NUMBER_FLAG_SIGNED);
         this.numeratorView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -44,7 +46,8 @@ public class EditablePolynomialElementView extends PolynomialElementBaseView<Edi
                 }
             }
         });
-        this.denominatorView.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_CLASS_NUMBER);
+        this.denominatorView.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL |
+                InputType.TYPE_CLASS_NUMBER);
         this.denominatorView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

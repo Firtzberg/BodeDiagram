@@ -54,6 +54,9 @@ public class PolynomialElementView extends PolynomialElementBaseView<TextView> {
 
     @Override
     public void setNumerator(double numerator) {
+        if((this.numerator == 0) ^ (numerator == 0)){
+            this.setVisibility(numerator == 0 ? GONE : VISIBLE);
+        }
         if(this.sign ^ (numerator >= 0)) {
             this.sign = !this.sign;
             reSign();
