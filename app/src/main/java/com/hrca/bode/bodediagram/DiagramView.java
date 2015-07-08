@@ -28,7 +28,7 @@ public class DiagramView extends SurfaceView {
     private static final float PIXELS_RIGHT_PADDING = 20 * DENSITY_COEFFICIENT;
     private static final float PIXELS_BOTTOM_PADDING = 20 * DENSITY_COEFFICIENT;
     private static final float PIXELS_BETWEEN_DIAGRAMS = 15 * DENSITY_COEFFICIENT;
-    private static final double FREQUENCY_DENSITY = 10;
+    private static final double FREQUENCY_DENSITY = 20;
     private static final float linesLength = 5;
     private static final float AMPLITUDE_STEP_DB = 20;
     private static final float PHASE_STEP_DEGREES = 45;
@@ -303,7 +303,7 @@ public class DiagramView extends SurfaceView {
                 x = getX(decadeStart + decimal);
                 y = getAmplitudeY(this.maxAmplitude);
                 if(decimal == 0){
-                    canvas.drawText("10^" + (int)decadeStart, x - 12, getAmplitudeY(0) + textPaint.getTextSize(), textPaint);
+                    canvas.drawText("10^" + (int)decadeStart, x - 12, getAmplitudeY(this.minAmplitude) + textPaint.getTextSize(), textPaint);
                 }
                 for(int i = 0; 4*i < pts.length; i ++){
                     pts[4*i] = x;
@@ -348,7 +348,7 @@ public class DiagramView extends SurfaceView {
     }
 
     private void drawAmplitudeAxis(Canvas canvas) {
-        canvas.drawLine(getX(this.minFrequency), getAmplitudeY(0), getX(this.maxFrequency), getAmplitudeY(0), this.axisPaint);
+        canvas.drawLine(getX(this.minFrequency), getAmplitudeY(this.minAmplitude), getX(this.maxFrequency), getAmplitudeY(this.minAmplitude), this.axisPaint);
         canvas.drawLine(getX(this.minFrequency), getAmplitudeY(this.maxAmplitude), getX(this.minFrequency), getAmplitudeY(this.minAmplitude), this.axisPaint);
     }
 
