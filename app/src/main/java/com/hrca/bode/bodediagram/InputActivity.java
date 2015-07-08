@@ -1,6 +1,7 @@
 package com.hrca.bode.bodediagram;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -8,7 +9,6 @@ import android.view.View;
 
 import com.hrca.bode.customs.EditableTransferFunctionView;
 import com.hrca.bode.customs.HistoryHelper;
-import com.hrca.bode.customs.PolynomialView;
 import com.hrca.bode.customs.TransferFunctionView;
 
 
@@ -16,8 +16,10 @@ public class InputActivity extends Activity {
     public static final String EXTRA_TRANSFER_FUNCTION = "transferFunction";
     public static final String EXTRA_POLYNOMIAL_IDENTIFIER = "polynomialIdentifier";
     public static final String EXTRA_POLYNOMIAL_CHAIN_IDENTIFIER = "polynomialChainIdentifier";
+    public static final String EXTRA_DISPLAY_ERROR_MESSAGE_R_ID = "displayErrorMessageRID";
     public static final int REQUEST_CODE_EDIT_POLYNOMIAL = 123;
     public static final int REQUEST_CODE_HISTORY = 234;
+    public static final int REQUEST_CODE_DISPLAY = 345;
     EditableTransferFunctionView transferFunctionView;
 
     @Override
@@ -78,7 +80,7 @@ public class InputActivity extends Activity {
         HistoryHelper.add(this.transferFunctionView);
         Intent i = new Intent(this, ResultActivity.class);
         i.putExtra(EXTRA_TRANSFER_FUNCTION, this.transferFunctionView.onSaveInstanceState());
-        startActivity(i);
+        startActivityForResult(i, REQUEST_CODE_DISPLAY);
     }
 
     @Override
@@ -106,6 +108,15 @@ public class InputActivity extends Activity {
                 }
             }
             return;
+        }
+        if(requestCode == REQUEST_CODE_DISPLAY) {
+            if(data != null){
+                new AlertDialog.Builder(this)
+                        .setTitle("Wrong input")
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setMessage(data.getIntExtra(EXTRA_DISPLAY_ERROR_MESSAGE_R_ID, R.string.hello_world))
+                        .show();
+            }
         }
     }
 }

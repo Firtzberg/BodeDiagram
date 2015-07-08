@@ -146,17 +146,22 @@ public class DiagramView extends SurfaceView {
                 phase += 180;
                 amplitude = -amplitude;
             }
-            //phase -= Math.floor((phase + 270) / 360)*360;
+            phase -= Math.floor((phase + 270) / 360)*360;
 
             amplitude = 20*Math.log10(amplitude);
             if(Double.isInfinite(amplitude)){
                 amplitude = amplitudes[i-1];
             }
             amplitudes[i] = amplitude;
-            if(amplitude > maxAmplitude)
-                maxAmplitude = amplitude;
-            if(amplitude < minAmplitude)
-                minAmplitude = amplitude;
+            if(i  == 0) {
+                minAmplitude = maxAmplitude = amplitude;
+            }
+            else {
+                if (amplitude > maxAmplitude)
+                    maxAmplitude = amplitude;
+                if (amplitude < minAmplitude)
+                    minAmplitude = amplitude;
+            }
 
             phases[i] = phase;
             if(phase > maxPhase)

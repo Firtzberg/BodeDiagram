@@ -123,21 +123,20 @@ public class PolynomialChainView extends LinearLayout {
         this.addBracket(false);
     }
 
-    public void addRoots(Complex64F[] roots){
+    public void addRoots(ArrayList<Complex64F> roots){
         PolynomialView pv;
-        for(int i = 0; i < roots.length; i ++){
-            if(roots[i] == null)
+        for(int i = 0; i < roots.size(); i ++){
+            if(roots.get(i) == null)
                 continue;
-            if(roots[i].getReal() == 0 && roots[i].getImaginary() == 0) {
-                continue;
-            }
             pv = PolynomialView.getUnused(this.getContext());
-            pv.setRoot(roots[i]);
+            pv.setRoot(roots.get(i));
             this.add(pv);
-            if(!roots[i].isReal()){
-                for(int j = i + 1; j < roots.length; j ++){
-                    if(roots[j].real == roots[i].real && roots[j].imaginary == -roots[i].imaginary)
-                        roots[j] = null;
+            if(!roots.get(i).isReal()){
+                for(int j = i + 1; j < roots.size(); j ++){
+                    if(roots.get(j).real == roots.get(i).real && roots.get(j).imaginary == -roots.get(i).imaginary) {
+                        roots.remove(j);
+                        break;
+                    }
                 }
             }
         }

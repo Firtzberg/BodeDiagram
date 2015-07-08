@@ -2,17 +2,15 @@ package com.hrca.bode.customs;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.hrca.bode.bodediagram.R;
 
 import org.ejml.data.Complex64F;
+
+import java.util.ArrayList;
 
 
 /**
@@ -85,11 +83,11 @@ public class TransferFunctionView extends TransferFunctionBaseView {
         }
     }
 
-    public void addNumeratorRoots(Complex64F[] roots){
+    public void addNumeratorRoots(ArrayList<Complex64F>roots){
         this.numeratorChainView.addRoots(roots);
     }
 
-    public void addDenominatorRoots(Complex64F[] roots){
+    public void addDenominatorRoots(ArrayList<Complex64F> roots){
         this.denominatorChainView.addRoots(roots);
     }
 

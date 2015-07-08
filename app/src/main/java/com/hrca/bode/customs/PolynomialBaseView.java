@@ -68,7 +68,8 @@ public abstract class PolynomialBaseView<T extends PolynomialElementBaseView> ex
         }
         else {
             float wn = (float)root.getMagnitude();
-            float zeta = (float)root.real/wn;
+            float zeta = (float)root.real/wn + 1.0F;
+            zeta -= 1.0;
             element = this.list.get(1);
             element.setNumerator(-2*zeta);
             element.setDenominator(wn);

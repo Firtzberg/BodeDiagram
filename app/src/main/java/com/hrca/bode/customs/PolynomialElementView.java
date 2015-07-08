@@ -35,7 +35,7 @@ public class PolynomialElementView extends PolynomialElementBaseView<TextView> {
 
         }
         else{
-            this.denominatorView.setText(String.valueOf(this.denominator));
+            this.denominatorView.setText(Float.toString((float)this.denominator));
             if(this.fractionBarView.getParent() == null)
                 this.fractalView.addView(this.fractionBarView);
             if(this.denominatorView.getParent() == null)

@@ -4,11 +4,15 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+
 import com.hrca.bode.customs.TransferFunctionView;
+
 import org.ejml.data.Complex64F;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
 import org.ejml.interfaces.decomposition.EigenDecomposition;
+
+import java.util.ArrayList;
 
 public class ResultActivity extends Activity {
     protected TransferFunctionView originalTransferFunction;
@@ -16,8 +20,23 @@ public class ResultActivity extends Activity {
     protected DiagramView diagram;
     double[] numeratorVector;
     double[] denominatorVector;
+    boolean frequencyFound;
     double minFrequency;
     double maxFrequency;
+
+    private class PolynomialChainParameters{
+        public final ArrayList<Complex64F> roots;
+        public final double[] vector;
+        public final double gain;
+        public final int astatism;
+
+        public PolynomialChainParameters(ArrayList<Complex64F> roots, double[] vector, double gain, int astatism){
+            this.roots = roots;
+            this.vector = vector;
+            this.gain = gain;
+            this.astatism = astatism;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,128 +52,56 @@ public class ResultActivity extends Activity {
         if(tf != null) {
             this.originalTransferFunction.onRestoreInstanceState(tf);
 
+            this.frequencyFound = false;
+
             double gain = this.originalTransferFunction.getGain();
+            if(gain == 0) {
+                finishWithError(R.string.hello_world);
+                return;
+            }
+
             int astatism = this.originalTransferFunction.getAstatism();
-            boolean frequencyFound = false;
             if(astatism != 0){
                 minFrequency = maxFrequency = 1;
                 frequencyFound = true;
             }
-            double[][] numeratorCoefficientArrays = this.originalTransferFunction.getNumeratorCoefficientArrays();
-            double[][] denominatorCoefficientArrays = this.originalTransferFunction.getDenominatorCoefficientArrays();
-            Complex64F[] roots;
-            double[] Tmp;
-            double[] coefficients;
-            int totalCoefficients = 1;
-            double frequency;
-            for (double[] numeratorCoefficientArray : numeratorCoefficientArrays) {
-                if (numeratorCoefficientArray.length > 1)
-                    totalCoefficients += numeratorCoefficientArray.length - 1;
-                for (int j = 0; j < numeratorCoefficientArray.length; j++) {
-                    if (numeratorCoefficientArray[j] != 0) {
-                        gain *= numeratorCoefficientArray[j];
-                        astatism += j;
-                        break;
-                    }
-                }
 
-                roots = findRoots(numeratorCoefficientArray);
-                for(Complex64F root : roots){
-                    frequency = (float) root.getReal();
-                    if(frequency == 0)
-                        continue;
-                    if(frequency < 0)
-                        frequency = -frequency;
-                    if(frequencyFound) {
-                        if (frequency < minFrequency)
-                            minFrequency = frequency;
-                        if (frequency > maxFrequency)
-                            maxFrequency = frequency;
-                    }
-                    else{
-                        maxFrequency = minFrequency = frequency;
-                        frequencyFound = true;
-                    }
-                }
-                this.formattedTransferFunction.addNumeratorRoots(roots);
+            PolynomialChainParameters numeratorParameters =
+                    AnalysePolynomialChain(this.originalTransferFunction.getNumeratorCoefficientArrays());
+            if(numeratorParameters.gain == 0) {
+                finishWithError(R.string.hello_world);
+                return;
             }
-            coefficients = new double[totalCoefficients];
-            coefficients[0] = this.originalTransferFunction.getGain();
-            int filled = 1;
-            for (double[] numeratorCoefficientArray : numeratorCoefficientArrays) {
-                int j, k = 0;
-                if (numeratorCoefficientArray.length == 0)
-                    continue;
-                Tmp = new double[totalCoefficients];
-                for (j = 0; j < filled; j++) {
-                    for (k = 0; k < numeratorCoefficientArray.length; k++) {
-                        Tmp[j + k] += coefficients[j] * numeratorCoefficientArray[k];
-                    }
-                }
-                filled += k - 1;
-                coefficients = Tmp;
-            }
-            
-            numeratorVector = coefficients;
-            
-            totalCoefficients = 1;
-            for (double[] denominatorCoefficientArray : denominatorCoefficientArrays) {
-                if (denominatorCoefficientArray.length > 1)
-                    totalCoefficients += denominatorCoefficientArray.length - 1;
-                for (int j = 0; j < denominatorCoefficientArray.length; j++) {
-                    if (denominatorCoefficientArray[j] != 0) {
-                        gain /= denominatorCoefficientArray[j];
-                        astatism -= j;
-                        break;
-                    }
-                }
-                roots = findRoots(denominatorCoefficientArray);
-                for(Complex64F root : roots){
-                    frequency = (float) root.getReal();
-                    if(frequency == 0)
-                        continue;
-                    if(frequency < 0)
-                        frequency = -frequency;
-                    if(frequencyFound) {
-                        if (frequency < minFrequency)
-                            minFrequency = frequency;
-                        if (frequency > maxFrequency)
-                            maxFrequency = frequency;
-                    }
-                    else{
-                        maxFrequency = minFrequency = frequency;
-                        frequencyFound = true;
-                    }
-                }
-                this.formattedTransferFunction.addDenominatorRoots(roots);
-            }
+            gain *= numeratorParameters.gain;
+            this.formattedTransferFunction.addNumeratorRoots(numeratorParameters.roots);
+            astatism += numeratorParameters.astatism;
+            this.numeratorVector =  numeratorParameters.vector;
 
-            coefficients = new double[totalCoefficients];
-            coefficients[0] = 1;
-            filled = 1;
-            for (double[] denominatorCoefficientArray : denominatorCoefficientArrays) {
-                int j, k = 0;
-                if (denominatorCoefficientArray.length == 0)
-                    continue;
-                Tmp = new double[totalCoefficients];
-                for (j = 0; j < filled; j++) {
-                    for (k = 0; k < denominatorCoefficientArray.length; k++) {
-                        Tmp[j + k] += coefficients[j] * denominatorCoefficientArray[k];
-                    }
-                }
-                filled += k - 1;
-                coefficients = Tmp;
+            PolynomialChainParameters denominatorParameters =
+                    AnalysePolynomialChain(this.originalTransferFunction.getDenominatorCoefficientArrays());
+            if(denominatorParameters.gain == 0) {
+                finishWithError(R.string.hello_world);
+                return;
             }
+            this.formattedTransferFunction.addDenominatorRoots(denominatorParameters.roots);
+            astatism -= denominatorParameters.astatism;
+            gain /= denominatorParameters.gain;
+            this.denominatorVector =  denominatorParameters.vector;
+
             if(!frequencyFound){
                 minFrequency = maxFrequency = 1;
             }
-            denominatorVector = coefficients;
+
             minFrequency = (float)Math.log10(minFrequency);
             maxFrequency = (float)Math.log10(maxFrequency);
 
             this.formattedTransferFunction.setAstatism(astatism);
             this.formattedTransferFunction.adjustMainFractalVisibility();
             this.formattedTransferFunction.setGain(gain);
+
+            for(int i = 0; i < this.numeratorVector.length; i ++){
+                this.numeratorVector[i] *= gain;
+            }
         }
     }
 
@@ -162,7 +109,96 @@ public class ResultActivity extends Activity {
     public void onResume(){
         super.onResume();
         this.diagram.draw(this.formattedTransferFunction.getAstatism(),
-                        numeratorVector, denominatorVector, minFrequency, maxFrequency);
+                numeratorVector, denominatorVector, minFrequency, maxFrequency);
+    }
+
+    private void finishWithError(int messageIdentifier){
+        Intent myIntent = new Intent();
+        myIntent.putExtra(InputActivity.EXTRA_DISPLAY_ERROR_MESSAGE_R_ID, messageIdentifier);
+        this.setResult(RESULT_OK, myIntent);
+        this.finish();
+    }
+
+    private PolynomialChainParameters AnalysePolynomialChain(double[][] coefficientArrays) {
+        ArrayList<Complex64F> roots = new ArrayList<>();
+        double[] Tmp;
+        double[] coefficients;
+        int totalCoefficients = 1;
+        double frequency;
+        int astatismChange = 0;
+        double gainChange = 1;
+        int firstNonZero;
+        int realLength;
+
+        for (int i = 0; i < coefficientArrays.length; i++) {
+            double[] coefficientArray = coefficientArrays[i];
+            if (coefficientArray.length < 1)
+                continue;
+            for (firstNonZero = 0; firstNonZero < coefficientArray.length; firstNonZero++) {
+                if (coefficientArray[firstNonZero] != 0) {
+                    gainChange *= coefficientArray[firstNonZero];
+                    break;
+                }
+            }
+            if (firstNonZero == coefficientArray.length) {
+                return new PolynomialChainParameters(roots, new double[]{1.0}, 0, 0);
+            }
+            for (realLength = coefficientArray.length; realLength > 0; realLength--) {
+                if (coefficientArray[realLength - 1] != 0) {
+                    realLength -= firstNonZero;
+                    break;
+                }
+            }
+            if (realLength != coefficientArray.length) {
+                Tmp = new double[realLength];
+                System.arraycopy(coefficientArray, firstNonZero, Tmp, 0, realLength);
+                coefficientArrays[i] = coefficientArray = Tmp;
+                astatismChange += firstNonZero;
+            }
+            totalCoefficients += realLength - 1;
+
+            for (Complex64F root : findRoots(coefficientArray)) {
+                roots.add(root);
+                frequency = (float) root.getMagnitude();
+                if (frequency == 0)
+                    continue;
+                if (frequency < 0)
+                    frequency = -frequency;
+                if (this.frequencyFound) {
+                    if (frequency < minFrequency)
+                        minFrequency = frequency;
+                    if (frequency > maxFrequency)
+                        maxFrequency = frequency;
+                } else {
+                    maxFrequency = minFrequency = frequency;
+                    this.frequencyFound = true;
+                }
+            }
+        }
+
+        double[] formerCoefficients = new double[totalCoefficients];
+        coefficients = new double[totalCoefficients];
+        coefficients[0] = 1;
+        int filled = 1;
+        int i, j = 0;
+        for (double[] coefficientArray : coefficientArrays) {
+            if (coefficientArray.length == 0)
+                continue;
+            for(i = 0; i < filled; i ++){
+                formerCoefficients[i] = 0;
+            }
+            for (i = 0; i < filled; i++) {
+                for (j = 0; j < coefficientArray.length; j++) {
+                    formerCoefficients[i + j] += coefficients[i] * coefficientArray[j];
+                }
+            }
+            filled += j - 1;
+            Tmp = coefficients;
+            coefficients = formerCoefficients;
+            formerCoefficients = Tmp;
+        }
+
+        return new PolynomialChainParameters(roots, coefficients, gainChange, astatismChange);
     }
 
     public static Complex64F[] findRoots(double... coefficients) {
