@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.hrca.bode.customs.HistoryHelper;
-import com.hrca.bode.customs.TransferFunctionView;
+import com.hrca.bode.customs.displaycustoms.TransferFunctionView;
 
 import java.util.ArrayList;
 

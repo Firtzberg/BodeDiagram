@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 
-import com.hrca.bode.customs.TransferFunctionView;
+import com.hrca.bode.customs.displaycustoms.TransferFunctionView;
 
 import org.ejml.data.Complex64F;
 import org.ejml.data.DenseMatrix64F;

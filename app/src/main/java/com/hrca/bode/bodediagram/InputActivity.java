@@ -7,9 +7,9 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.View;
 
-import com.hrca.bode.customs.EditableTransferFunctionView;
 import com.hrca.bode.customs.HistoryHelper;
-import com.hrca.bode.customs.TransferFunctionView;
+import com.hrca.bode.customs.displaycustoms.TransferFunctionView;
+import com.hrca.bode.customs.editablecustoms.EditableTransferFunctionView;
 
 
 public class InputActivity extends Activity {

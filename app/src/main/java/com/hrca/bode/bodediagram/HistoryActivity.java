@@ -10,7 +10,7 @@ import android.view.ViewParent;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.hrca.bode.customs.TransferFunctionView;
+import com.hrca.bode.customs.displaycustoms.TransferFunctionView;
 
 
 public class HistoryActivity extends Activity

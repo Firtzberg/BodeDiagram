@@ -3,11 +3,9 @@ package com.hrca.bode.bodediagram;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 
-import com.hrca.bode.customs.EditablePolynomialView;
+import com.hrca.bode.customs.editablecustoms.EditablePolynomialView;
 
 
 public class PolynomialActivity extends Activity {

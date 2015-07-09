@@ -6,10 +6,12 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.hrca.bode.bodediagram.R;
+import com.hrca.bode.customs.displaycustoms.PolynomialView;
 
 import org.ejml.data.Complex64F;
 
@@ -199,6 +201,14 @@ public class PolynomialChainView extends LinearLayout {
             return;
         }
         this.list.get(identifier).onRestoreInstanceState(polynomialState);
+    }
+
+    public int size(){
+        return this.list.size();
+    }
+
+    public int indexOf(View v){
+        return this.list.indexOf(v);
     }
 
     @Override

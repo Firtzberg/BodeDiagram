@@ -47,7 +47,7 @@
             android:layout_toLeftOf="@+id/add_btns"
             android:layout_toStartOf="@+id/add_btns"
             android:id="@+id/view2"
-            class="com.hrca.bode.customs.EditableTransferFunctionView" />
+            class="com.hrca.bode.customs.editablecustoms.EditableTransferFunctionView" />
 
         <LinearLayout
             android:id="@+id/add_btns"

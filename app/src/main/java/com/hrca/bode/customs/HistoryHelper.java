@@ -3,6 +3,10 @@ package com.hrca.bode.customs;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.hrca.bode.customs.displaycustoms.PolynomialView;
+import com.hrca.bode.customs.displaycustoms.TransferFunctionView;
+import com.hrca.bode.customs.editablecustoms.EditableTransferFunctionView;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
