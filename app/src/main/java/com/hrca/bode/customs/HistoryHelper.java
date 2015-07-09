@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import com.hrca.bode.customs.displaycustoms.PolynomialView;
 import com.hrca.bode.customs.displaycustoms.TransferFunctionView;
-import com.hrca.bode.customs.editablecustoms.EditableTransferFunctionView;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -240,7 +239,7 @@ public class HistoryHelper {
         return element;
     }
 
-    public static void add(EditableTransferFunctionView tf){
+    public static void add(TransferFunctionBaseView tf){
         FileOutputStream out;
         try{
             FileInputStream in = tf.getContext().openFileInput(HISTORY_FILE);

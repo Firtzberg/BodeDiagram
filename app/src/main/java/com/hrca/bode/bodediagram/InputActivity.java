@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.View;
 
-import com.hrca.bode.customs.HistoryHelper;
 import com.hrca.bode.customs.displaycustoms.TransferFunctionView;
 import com.hrca.bode.customs.editablecustoms.EditableTransferFunctionView;
 
@@ -77,7 +76,6 @@ public class InputActivity extends Activity {
     }
 
     public void bode(View v){
-        HistoryHelper.add(this.transferFunctionView);
         Intent i = new Intent(this, ResultActivity.class);
         i.putExtra(EXTRA_TRANSFER_FUNCTION, this.transferFunctionView.onSaveInstanceState());
         startActivityForResult(i, REQUEST_CODE_DISPLAY);

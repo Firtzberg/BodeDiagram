@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 
+import com.hrca.bode.customs.HistoryHelper;
 import com.hrca.bode.customs.displaycustoms.TransferFunctionView;
 
 import org.ejml.data.Complex64F;
@@ -15,7 +16,7 @@ import org.ejml.interfaces.decomposition.EigenDecomposition;
 import java.util.ArrayList;
 
 public class ResultActivity extends Activity {
-    public static final String PARCELABLE_FORMATTED_TF = "formatedTF";
+    public static final String PARCELABLE_FORMATTED_TF = "formattedTF";
     public static final String PARCELABLE_ORIGINAL_TF = "originalTF";
     protected TransferFunctionView originalTransferFunction;
     protected TransferFunctionView formattedTransferFunction;
@@ -104,6 +105,7 @@ public class ResultActivity extends Activity {
             for(int i = 0; i < this.numeratorVector.length; i ++){
                 this.numeratorVector[i] *= gain;
             }
+            HistoryHelper.add(this.originalTransferFunction);
         }
     }
 
