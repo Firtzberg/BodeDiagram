@@ -114,8 +114,8 @@ public abstract class PolynomialElementBaseView<T extends TextView> extends Rela
         this.exponentView.setLayoutParams(rlp);
         this.exponentView.setExponent(exponent);
         this.exponentView.setId(++id);
-        if(exponent != 0)
-            this.addView(this.exponentView);
+        this.exponentView.setVisibility(exponent == 0 ? GONE : VISIBLE);
+        this.addView(this.exponentView);
 
         reSign();
     }
@@ -128,13 +128,8 @@ public abstract class PolynomialElementBaseView<T extends TextView> extends Rela
     }
 
     protected void reSign(){
-        if(!this.sign){
-            this.signView.setText("-");
-            return;
-        }
-        if(this.showSign)
-            this.signView.setText("+");
-        else this.signView.setText("");
+        this.signView.setVisibility(!this.sign | this.showSign ? VISIBLE : GONE);
+        this.signView.setText(this.sign ? "+" : "-");
     }
 
     public double getNumerator() {

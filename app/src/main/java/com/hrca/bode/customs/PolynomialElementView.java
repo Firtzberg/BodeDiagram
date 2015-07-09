@@ -27,36 +27,37 @@ public class PolynomialElementView extends PolynomialElementBaseView<TextView> {
     }
 
     protected void reposition(){
+        if((float)this.numerator == 0) {
+            this.setVisibility(GONE);
+            return;
+        }
+        else this.setVisibility(VISIBLE);
+
         reSign();
 
-        if(this.denominator == 1){
-            this.fractalView.removeView(this.denominatorView);
-            this.fractalView.removeView(this.fractionBarView);
-
-        }
-        else{
-            this.denominatorView.setText(Float.toString((float)this.denominator));
-            if(this.fractionBarView.getParent() == null)
-                this.fractalView.addView(this.fractionBarView);
-            if(this.denominatorView.getParent() == null)
-                this.fractalView.addView(this.denominatorView);
-        }
-
         if(this.denominator == 1 && this.numerator == 1 && this.getExponent() != 0)
-            this.numeratorView.setText("");
-        else this.numeratorView.setText(Float.toString((float)this.numerator));
+            this.fractalView.setVisibility(GONE);
+        else {
+            this.fractalView.setVisibility(VISIBLE);
+            this.numeratorView.setText(Float.toString((float) this.numerator));
 
-        if(this.getExponent() == 0)
-            this.removeView(this.exponentView);
-        else if(this.exponentView.getParent() == null)
-            this.addView(this.exponentView);
+            if(this.denominator == 1){
+                this.denominatorView.setVisibility(GONE);
+                this.fractionBarView.setVisibility(GONE);
+
+            }
+            else{
+                this.denominatorView.setText(Float.toString((float)this.denominator));
+                this.fractionBarView.setVisibility(VISIBLE);
+                this.denominatorView.setVisibility(VISIBLE);
+            }
+        }
+
+        this.exponentView.setVisibility(this.getExponent() == 0 ? GONE : VISIBLE);
     }
 
     @Override
     public void setNumerator(double numerator) {
-        if((this.numerator == 0) ^ (numerator == 0)){
-            this.setVisibility(numerator == 0 ? GONE : VISIBLE);
-        }
         if(this.sign ^ (numerator >= 0)) {
             this.sign = !this.sign;
             reSign();
@@ -66,12 +67,7 @@ public class PolynomialElementView extends PolynomialElementBaseView<TextView> {
         if(this.numerator == numerator)
             return;
         this.numerator = numerator;
-        if(this.numerator == 1 && this.denominator == 1 && this.getExponent() != 0) {
-            this.numeratorView.setText("");
-        }
-        else{
-            this.numeratorView.setText(Float.toString((float)numerator));
-        }
+        this.reposition();
     }
 
     @Override
@@ -80,14 +76,8 @@ public class PolynomialElementView extends PolynomialElementBaseView<TextView> {
             denominator = 1;
         if(this.denominator == denominator)
             return;
-        if(this.denominator == 1 || denominator == 1) {
-            this.denominator = denominator;
-            this.reposition();
-        }
-        else{
-            this.denominator = denominator;
-            this.denominatorView.setText(Float.toString((float)denominator));
-        }
+        this.denominator = denominator;
+        this.reposition();
     }
 
     @Override

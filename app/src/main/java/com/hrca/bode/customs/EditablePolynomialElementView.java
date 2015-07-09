@@ -107,11 +107,7 @@ public class EditablePolynomialElementView extends PolynomialElementBaseView<Edi
             return;
         if((this.getExponent() == 0) ^ (exponent == 0)){
             this.exponentView.setExponent(exponent);
-            if(exponent == 0) {
-                this.removeView(this.exponentView);
-            }
-            else if(this.exponentView.getParent() == null)
-                this.addView(this.exponentView);
+            this.exponentView.setVisibility(exponent == 0 ? GONE : VISIBLE);
         }
         else{
             this.exponentView.setExponent(exponent);

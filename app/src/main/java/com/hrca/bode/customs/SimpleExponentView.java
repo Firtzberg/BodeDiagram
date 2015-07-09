@@ -70,8 +70,11 @@ public class SimpleExponentView extends RelativeLayout {
             return;
         this.exponent = exponent;
         if(exponent == 1)
-            this.exponentView.setText("");
-        else this.exponentView.setText(String.valueOf(exponent));
+            this.exponentView.setVisibility(GONE);
+        else {
+            this.exponentView.setVisibility(VISIBLE);
+            this.exponentView.setText(String.valueOf(exponent));
+        }
     }
 
     public String getBase(){
