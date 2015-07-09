@@ -27,11 +27,7 @@ public class PolynomialElementView extends PolynomialElementBaseView<TextView> {
     }
 
     protected void reposition(){
-        if((float)this.numerator == 0) {
-            this.setVisibility(GONE);
-            return;
-        }
-        else this.setVisibility(VISIBLE);
+        this.setVisibility((float)this.numerator == 0 ? GONE : VISIBLE);
 
         reSign();
 

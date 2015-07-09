@@ -78,7 +78,7 @@ public abstract class PolynomialElementBaseView<T extends TextView> extends Rela
         this.numeratorView.setText(Double.toString(this.numerator));
         this.numeratorView.setId(++id);
 
-        llp = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 2);
+        llp = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 3);
         this.fractionBarView.setLayoutParams(llp);
         this.fractionBarView.setId(++id);
         this.fractionBarView.setBackgroundColor(Color.BLACK);
@@ -105,7 +105,7 @@ public abstract class PolynomialElementBaseView<T extends TextView> extends Rela
         this.fractalView.addView(this.numeratorView);
         this.fractalView.addView(this.fractionBarView);
         this.fractalView.addView(this.denominatorView);
-        this.fractalView.setPadding(7, 0, 7, 0);
+        this.fractalView.setPadding(5, 0, 5, 0);
         this.addView(this.fractalView);
 
         rlp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);

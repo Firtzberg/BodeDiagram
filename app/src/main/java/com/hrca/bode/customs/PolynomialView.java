@@ -1,6 +1,7 @@
 package com.hrca.bode.customs;
 
 import android.content.Context;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 
 import org.ejml.data.Complex64F;
@@ -75,6 +76,29 @@ public class PolynomialView extends PolynomialBaseView<PolynomialElementView> {
             element.setShowSign(false);
             element.setNumerator(1);
             element.setDenominator(wn*wn);
+        }
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        super.onRestoreInstanceState(state);
+        int first = -1;
+        for(int i = 0; i < this.list.size(); i ++){
+            if((float)this.list.get(i).getNumerator() != 0)
+                first = i;
+        }
+
+        PolynomialElementView zero;
+        if(first == -1){
+            zero = this.list.get(0);
+            zero.setVisibility(VISIBLE);
+            zero.setShowSign(false);
+            zero.reSign();
+        }
+        else if(first != this.list.size() - 1){
+            zero = this.list.get(first);
+            zero.setShowSign(false);
+            zero.reSign();
         }
     }
 }
