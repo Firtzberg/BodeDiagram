@@ -18,14 +18,14 @@ import java.util.ArrayList;
 public class ResultActivity extends Activity {
     public static final String PARCELABLE_FORMATTED_TF = "formattedTF";
     public static final String PARCELABLE_ORIGINAL_TF = "originalTF";
+    private static final double FREQUENCY_DENSITY = 20;
     protected TransferFunctionView originalTransferFunction;
     protected TransferFunctionView formattedTransferFunction;
     protected DiagramView diagram;
-    double[] numeratorVector;
-    double[] denominatorVector;
     boolean frequencyFound;
     double minFrequency;
     double maxFrequency;
+    private final Complex64F reusableComplex = new Complex64F();
 
     private class PolynomialChainParameters{
         public final ArrayList<Complex64F> roots;
@@ -78,7 +78,6 @@ public class ResultActivity extends Activity {
             gain *= numeratorParameters.gain;
             this.formattedTransferFunction.addNumeratorRoots(numeratorParameters.roots);
             astatism += numeratorParameters.astatism;
-            this.numeratorVector =  numeratorParameters.vector;
 
             PolynomialChainParameters denominatorParameters =
                     AnalysePolynomialChain(this.originalTransferFunction.getDenominatorCoefficientArrays());
@@ -89,45 +88,35 @@ public class ResultActivity extends Activity {
             this.formattedTransferFunction.addDenominatorRoots(denominatorParameters.roots);
             astatism -= denominatorParameters.astatism;
             gain /= denominatorParameters.gain;
-            this.denominatorVector =  denominatorParameters.vector;
 
             if(!frequencyFound){
                 minFrequency = maxFrequency = 1;
             }
 
-            minFrequency = (float)Math.log10(minFrequency);
-            maxFrequency = (float)Math.log10(maxFrequency);
+            minFrequency = (float)Math.log10(minFrequency) - 1;
+            maxFrequency = (float)Math.log10(maxFrequency) + 1;
 
             this.formattedTransferFunction.setAstatism(astatism);
             this.formattedTransferFunction.adjustMainFractalVisibility();
             this.formattedTransferFunction.setGain(gain);
 
-            for(int i = 0; i < this.numeratorVector.length; i ++){
-                this.numeratorVector[i] *= gain;
+            for(int i = 0; i < numeratorParameters.vector.length; i ++){
+                numeratorParameters.vector[i] *= gain;
             }
             HistoryHelper.add(this.originalTransferFunction);
+            this.diagram.setPoints(calculatePoints(astatism, numeratorParameters.vector, denominatorParameters.vector));
         }
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        this.diagram.draw(this.formattedTransferFunction.getAstatism(),
-                numeratorVector, denominatorVector, minFrequency, maxFrequency);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putParcelable(PARCELABLE_ORIGINAL_TF, this.originalTransferFunction.onSaveInstanceState());
-        savedInstanceState.putParcelable(PARCELABLE_FORMATTED_TF, this.formattedTransferFunction.onSaveInstanceState());
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        this.originalTransferFunction.onRestoreInstanceState(savedInstanceState.getParcelable(PARCELABLE_ORIGINAL_TF));
-        this.formattedTransferFunction.onRestoreInstanceState(savedInstanceState.getParcelable(PARCELABLE_FORMATTED_TF));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ResultActivity.this.diagram.redraw();
+            }
+        }).start();
     }
 
     private void finishWithError(int messageIdentifier){
@@ -216,7 +205,71 @@ public class ResultActivity extends Activity {
             formerCoefficients = Tmp;
         }
 
+        for(i = 0; i < coefficients.length; i ++)
+            coefficients[i] /= gainChange;
+
         return new PolynomialChainParameters(roots, coefficients, gainChange, astatismChange);
+    }
+
+    protected Point[] calculatePoints(int astatism, double[] numeratorVector, double[] denominatorVector){
+        double[] frequencies = getFrequencies();
+        Point[] points = new Point[frequencies.length];
+        Complex64F value;
+        double amplitude;
+        double lastAmp = 1;
+        double phase;
+        double m;
+        for(int i = 0; i < points.length; i++){
+            value = calculatePolynomialValue(frequencies[i], numeratorVector);
+            amplitude = value.getMagnitude();
+            phase = Math.atan2(value.imaginary, value.real);
+            value = calculatePolynomialValue(frequencies[i], denominatorVector);
+            m = value.getMagnitude();
+            if(m == 0) {
+                amplitude = Double.POSITIVE_INFINITY;
+            }
+            else{
+                amplitude /= value.getMagnitude();
+            }
+            phase -= Math.atan2(value.imaginary, value.real);
+            phase *= 180/Math.PI;
+            amplitude *= Math.pow(frequencies[i], astatism);
+            phase += astatism * 90;
+
+            if(Double.isInfinite(amplitude)){
+                amplitude = lastAmp;
+            }
+            lastAmp = amplitude;
+
+            points[i] = new Point(amplitude, phase, frequencies[i]);
+        }
+        return points;
+    }
+
+    private double[] getFrequencies(){
+        double step = 1/FREQUENCY_DENSITY;
+        int total = (int)((maxFrequency - minFrequency)*FREQUENCY_DENSITY) + 1;
+        double[] result = new double[total];
+        double current = minFrequency;
+        for(int i = 0 ; i < total; i++, current += step){
+            result[i] = Math.pow(10, current);
+        }
+        return result;
+    }
+
+    private Complex64F calculatePolynomialValue(double frequency, double[] coefficients){
+        int index = coefficients.length - 1;
+        double resultReal = coefficients[index];
+        double resultImaginary = 0;
+        double tmp;
+        for (index --; index >= 0; index --) {
+            tmp = resultReal;
+            resultReal = -resultImaginary*frequency + coefficients[index];
+            resultImaginary = tmp * frequency;
+        }
+        this.reusableComplex.real = resultReal;
+        this.reusableComplex.imaginary = resultImaginary;
+        return this.reusableComplex;
     }
 
     public static Complex64F[] findRoots(double... coefficients) {
@@ -252,5 +305,19 @@ public class ResultActivity extends Activity {
         }
 
         return roots;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putParcelable(PARCELABLE_ORIGINAL_TF, this.originalTransferFunction.onSaveInstanceState());
+        savedInstanceState.putParcelable(PARCELABLE_FORMATTED_TF, this.formattedTransferFunction.onSaveInstanceState());
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        this.originalTransferFunction.onRestoreInstanceState(savedInstanceState.getParcelable(PARCELABLE_ORIGINAL_TF));
+        this.formattedTransferFunction.onRestoreInstanceState(savedInstanceState.getParcelable(PARCELABLE_FORMATTED_TF));
     }
 }
