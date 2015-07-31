@@ -33,10 +33,12 @@ public class DiagramView extends SurfaceView {
     private static final int COLOR_DEFAULT_LINES = Color.LTGRAY;
     private static final int COLOR_DEFAULT_AXIS = Color.BLACK;
     private static final int COLOR_DEFAULT_CURVE = Color.BLUE;
+    private static final int COLOR_DEFAULT_SIMPLIFIED_CURVE = Color.RED;
     private static final int COLOR_DEFAULT_TEXT = Color.BLACK;
     private static final float SIZE_DEFAULT_TEXT = 12 * Resources.getSystem().getDisplayMetrics().scaledDensity;
     private static final float RELATIVE_CURVE_THICKNESS = 1.5F;
     private Point[] points;
+    private SimplifiedCurve.SimplifiedCurvePoint[] simplifiedCurvePoints;
     private float minFrequency;
     private float maxFrequency;
     private float minAmplitude;
@@ -47,6 +49,7 @@ public class DiagramView extends SurfaceView {
     private final Paint linesPaint;
     private final Paint axisPaint;
     private final Paint curvePaint;
+    private final Paint simplifiedCurvePaint;
     private final Paint textPaint;
 
     public DiagramView(Context context) {
@@ -62,6 +65,8 @@ public class DiagramView extends SurfaceView {
         this.axisPaint.setStrokeWidth(DENSITY_COEFFICIENT);
         this.curvePaint = new Paint();
         this.curvePaint.setStrokeWidth(RELATIVE_CURVE_THICKNESS * DENSITY_COEFFICIENT);
+        this.simplifiedCurvePaint = new Paint();
+        this.simplifiedCurvePaint.setStrokeWidth(RELATIVE_CURVE_THICKNESS * DENSITY_COEFFICIENT);
         this.textPaint = new Paint();
         this.textPaint.setStrokeWidth(DENSITY_COEFFICIENT);
 
@@ -75,6 +80,7 @@ public class DiagramView extends SurfaceView {
                 0, 0);
         int axisColor;
         int curveColor;
+        int simplifiedCurveColor;
         int linesColor;
         int textColor;
         float textSize;
@@ -83,6 +89,7 @@ public class DiagramView extends SurfaceView {
             linesColor = a.getColor(R.styleable.DiagramView_lines_color, COLOR_DEFAULT_LINES);
             axisColor = a.getColor(R.styleable.DiagramView_axis_color, COLOR_DEFAULT_AXIS);
             curveColor = a.getColor(R.styleable.DiagramView_curve_color, COLOR_DEFAULT_CURVE);
+            simplifiedCurveColor = a.getColor(R.styleable.DiagramView_simplified_curve_color, COLOR_DEFAULT_SIMPLIFIED_CURVE);
             textColor = a.getColor(R.styleable.DiagramView_curve_color, COLOR_DEFAULT_TEXT);
             textSize = a.getFloat(R.styleable.DiagramView_size_text, SIZE_DEFAULT_TEXT);
         } finally {
@@ -91,6 +98,7 @@ public class DiagramView extends SurfaceView {
         this.linesPaint.setColor(linesColor);
         this.axisPaint.setColor(axisColor);
         this.curvePaint.setColor(curveColor);
+        this.simplifiedCurvePaint.setColor(simplifiedCurveColor);
         this.textPaint.setColor(textColor);
         this.textPaint.setTextSize(textSize);
     }
@@ -131,6 +139,10 @@ public class DiagramView extends SurfaceView {
         this.minPhase = ((float)Math.floor(this.minPhase / PHASE_STEP_DEGREES)) * PHASE_STEP_DEGREES;
     }
 
+    public void setSimplifiedPoints(SimplifiedCurve.SimplifiedCurvePoint[] simplifiedCurvePoints){
+        this.simplifiedCurvePoints = simplifiedCurvePoints;
+    }
+
     public void redraw(){
         if(points == null)
             return;
@@ -138,7 +150,7 @@ public class DiagramView extends SurfaceView {
         long time = startTime;
         long end;
         end = System.currentTimeMillis();
-        Log.d("Time", "Calculation time: " + Long.toString(end - time) + " milisekunds");
+        Log.d("Time", "Calculation time: " + Long.toString(end - time) + " ms");
         time = end;
         View parent = (View)this.getParent();
         this.getLayoutParams().height = (int)getPhaseY(this.minPhase) + (int)PIXELS_BOTTOM_PADDING;
@@ -159,38 +171,57 @@ public class DiagramView extends SurfaceView {
             return;
         }
         end = System.currentTimeMillis();
-        Log.d("Time", "Waiten for canvas: " + Long.toString(end - time) + " milisekunds");
+        Log.d("Time", "Waiten for canvas: " + Long.toString(end - time) + " ms");
         time = end;
         canvas.drawColor(backgroundColor);
         drawAmplitudeVerticals(canvas);
         end = System.currentTimeMillis();
-        Log.d("Time", "Amplitudn verticals drawn in " + Long.toString(end - time) + " milisekunds");
+        Log.d("Time", "Amplitudn verticals drawn in " + Long.toString(end - time) + " ms");
         time = end;
         drawAmplitudeHorizontals(canvas);
         end = System.currentTimeMillis();
-        Log.d("Time", "Amplitudne horizontals drawn in " + Long.toString(end - time) + " milisekunds");
+        Log.d("Time", "Amplitudne horizontals drawn in " + Long.toString(end - time) + " ms");
         time = end;
         drawAmplitudeAxis(canvas);
         end = System.currentTimeMillis();
-        Log.d("Time", "Amplitude axises drawn in " + Long.toString(end - time) + " milisekunds");
+        Log.d("Time", "Amplitude axises drawn in " + Long.toString(end - time) + " ms");
         time = end;
         drawPhaseHorizontals(canvas);
         end = System.currentTimeMillis();
-        Log.d("Time", "Phase horzontals drawn in " + Long.toString(end - time) + " milisekunds");
+        Log.d("Time", "Phase horzontals drawn in " + Long.toString(end - time) + " ms");
         time = end;
         drawPhaseVerticals(canvas);
         end = System.currentTimeMillis();
-        Log.d("Time", "Phase verticals drawn in " + Long.toString(end - time) + " milisekunds");
+        Log.d("Time", "Phase verticals drawn in " + Long.toString(end - time) + " ms");
         time = end;
         drawPhaseAxis(canvas);
         end = System.currentTimeMillis();
-        Log.d("Time", "Phase axises drawn in " + Long.toString(end - time) + " milisekunds");
+        Log.d("Time", "Phase axises drawn in " + Long.toString(end - time) + " ms");
         time = end;
         drawCurves(canvas, this.points);
+        Log.d("Time", "Curves drawn in " + Long.toString(end - time) + " ms");
+        time = end;
+        drawSimplifiedCurves(canvas, this.simplifiedCurvePoints);
         end = System.currentTimeMillis();
-        Log.d("Time", "Curves drawn in " + Long.toString(end - time) + " milisekunds");
-        Log.d("Time", "Total drawing time " + Long.toString(end - startTime) + " milisekunds");
+        Log.d("Time", "Simplified curve drawn in " + Long.toString(end - time) + " ms");
+        Log.d("Time", "Total drawing time " + Long.toString(end - startTime) + " ms");
         sh.unlockCanvasAndPost(canvas);
+    }
+
+    private void drawSimplifiedCurves(Canvas canvas, SimplifiedCurve.SimplifiedCurvePoint[] simplifiedCurvePoints) {
+        int length = simplifiedCurvePoints.length - 1;
+        float[] pts = new float[4*length];
+        int i;
+
+        pts[0] = getX(simplifiedCurvePoints[0]);
+        pts[1] = getAmplitudeY(simplifiedCurvePoints[0]);
+        for(i = 1; i < length; i ++){
+            pts[4*i - 2] = pts[4*i + 0] = getX(simplifiedCurvePoints[i]);
+            pts[4*i - 1] = pts[4*i + 1] = getAmplitudeY(simplifiedCurvePoints[i]);
+        }
+        pts[4*i - 2] = getX(simplifiedCurvePoints[i]);
+        pts[4*i - 1] = getAmplitudeY(simplifiedCurvePoints[i]);
+        canvas.drawLines(pts, this.simplifiedCurvePaint);
     }
 
     private void drawAmplitudeHorizontals(Canvas canvas){
@@ -318,19 +349,19 @@ public class DiagramView extends SurfaceView {
 
         pts[0] = getX(points[0]);
         pts[1] = getAmplitudeY(points[0]);
-        for(i = 0; i < length - 1; i ++){
-            pts[4*i + 2] = pts[4*i + 4] = getX(points[i]);
-            pts[4*i + 3] = pts[4*i + 5] = getAmplitudeY(points[i]);
+        for(i = 1; i < length; i ++){
+            pts[4*i - 2] = pts[4*i + 0] = getX(points[i]);
+            pts[4*i - 1] = pts[4*i + 1] = getAmplitudeY(points[i]);
         }
-        pts[4*i + 2] = getX(points[i]);
-        pts[4*i + 3] = getAmplitudeY(points[i]);
+        pts[4*i - 2] = getX(points[i]);
+        pts[4*i - 1] = getAmplitudeY(points[i]);
         canvas.drawLines(pts, this.curvePaint);
 
         pts[1] = getPhaseY(points[0]);
-        for(i = 0; i < length - 1; i ++){
-            pts[4*i + 3] = pts[4*i + 5] = getPhaseY(points[i]);
+        for(i = 1; i < length; i ++){
+            pts[4*i - 1] = pts[4*i + 1] = getPhaseY(points[i]);
         }
-        pts[4*i + 3] = getPhaseY(points[i]);
+        pts[4*i - 1] = getPhaseY(points[i]);
         canvas.drawLines(pts, this.curvePaint);
     }
 
@@ -356,5 +387,13 @@ public class DiagramView extends SurfaceView {
 
     private float getPhaseY(Point point){
         return getPhaseY(point.phaseDegree);
+    }
+
+    private float getX(SimplifiedCurve.SimplifiedCurvePoint point){
+        return getX((float) Math.log10(point.frequency));
+    }
+
+    private float getAmplitudeY(SimplifiedCurve.SimplifiedCurvePoint point){
+        return getAmplitudeY(point.amplitudeDB);
     }
 }

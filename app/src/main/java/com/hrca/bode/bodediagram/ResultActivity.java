@@ -103,7 +103,14 @@ public class ResultActivity extends Activity {
                 numeratorParameters.vector[i] *= gain;
             }
             HistoryHelper.add(this.originalTransferFunction);
+
             this.diagram.setPoints(calculatePoints(astatism, numeratorParameters.vector, denominatorParameters.vector));
+            SimplifiedCurve curve = new SimplifiedCurve(astatism, gain);
+            for(Complex64F zero : numeratorParameters.roots)
+                curve.split(zero.getMagnitude(), true);
+            for(Complex64F pole : denominatorParameters.roots)
+                curve.split(pole.getMagnitude(), false);
+            this.diagram.setSimplifiedPoints(curve.getPoints());
         }
     }
 
