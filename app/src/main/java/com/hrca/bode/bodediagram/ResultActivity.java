@@ -25,7 +25,6 @@ public class ResultActivity extends Activity {
     boolean frequencyFound;
     double minFrequency;
     double maxFrequency;
-    private final Complex64F reusableComplex = new Complex64F();
 
     private class PolynomialChainParameters{
         public final ArrayList<Complex64F> roots;
@@ -212,36 +211,11 @@ public class ResultActivity extends Activity {
     }
 
     protected Point[] calculatePoints(int astatism, double[] numeratorVector, double[] denominatorVector){
+        TFCalculatorInterface calculator = new TFCalculator(astatism, numeratorVector, denominatorVector);
         double[] frequencies = getFrequencies();
         Point[] points = new Point[frequencies.length];
-        Complex64F value;
-        double amplitude;
-        double lastAmp = 1;
-        double phase;
-        double m;
         for(int i = 0; i < points.length; i++){
-            value = calculatePolynomialValue(frequencies[i], numeratorVector);
-            amplitude = value.getMagnitude();
-            phase = Math.atan2(value.imaginary, value.real);
-            value = calculatePolynomialValue(frequencies[i], denominatorVector);
-            m = value.getMagnitude();
-            if(m == 0) {
-                amplitude = Double.POSITIVE_INFINITY;
-            }
-            else{
-                amplitude /= value.getMagnitude();
-            }
-            phase -= Math.atan2(value.imaginary, value.real);
-            phase *= 180/Math.PI;
-            amplitude *= Math.pow(frequencies[i], astatism);
-            phase += astatism * 90;
-
-            if(Double.isInfinite(amplitude)){
-                amplitude = lastAmp;
-            }
-            lastAmp = amplitude;
-
-            points[i] = new Point(amplitude, phase, frequencies[i]);
+            points[i] = calculator.calculatePoint(frequencies[i]);
         }
         return points;
     }
@@ -255,21 +229,6 @@ public class ResultActivity extends Activity {
             result[i] = Math.pow(10, current);
         }
         return result;
-    }
-
-    private Complex64F calculatePolynomialValue(double frequency, double[] coefficients){
-        int index = coefficients.length - 1;
-        double resultReal = coefficients[index];
-        double resultImaginary = 0;
-        double tmp;
-        for (index --; index >= 0; index --) {
-            tmp = resultReal;
-            resultReal = -resultImaginary*frequency + coefficients[index];
-            resultImaginary = tmp * frequency;
-        }
-        this.reusableComplex.real = resultReal;
-        this.reusableComplex.imaginary = resultImaginary;
-        return this.reusableComplex;
     }
 
     public static Complex64F[] findRoots(double... coefficients) {
