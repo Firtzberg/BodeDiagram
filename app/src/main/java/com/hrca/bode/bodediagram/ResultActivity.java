@@ -22,9 +22,6 @@ public class ResultActivity extends Activity {
     protected TransferFunctionView originalTransferFunction;
     protected TransferFunctionView formattedTransferFunction;
     protected DiagramView diagram;
-    boolean frequencyFound;
-    double minFrequency;
-    double maxFrequency;
 
     private class PolynomialChainParameters{
         public final ArrayList<Complex64F> roots;
@@ -54,8 +51,6 @@ public class ResultActivity extends Activity {
         if(tf != null) {
             this.originalTransferFunction.onRestoreInstanceState(tf);
 
-            this.frequencyFound = false;
-
             double gain = this.originalTransferFunction.getGain();
             if(gain == 0) {
                 finishWithError(R.string.gain_zero);
@@ -63,10 +58,6 @@ public class ResultActivity extends Activity {
             }
 
             int astatism = this.originalTransferFunction.getAstatism();
-            if(astatism != 0){
-                minFrequency = maxFrequency = 1;
-                frequencyFound = true;
-            }
 
             PolynomialChainParameters numeratorParameters =
                     AnalysePolynomialChain(this.originalTransferFunction.getNumeratorCoefficientArrays());
@@ -75,7 +66,6 @@ public class ResultActivity extends Activity {
                 return;
             }
             gain *= numeratorParameters.gain;
-            this.formattedTransferFunction.addNumeratorRoots(numeratorParameters.roots);
             astatism += numeratorParameters.astatism;
 
             PolynomialChainParameters denominatorParameters =
@@ -84,33 +74,31 @@ public class ResultActivity extends Activity {
                 finishWithError(R.string.denominator_zero);
                 return;
             }
-            this.formattedTransferFunction.addDenominatorRoots(denominatorParameters.roots);
             astatism -= denominatorParameters.astatism;
             gain /= denominatorParameters.gain;
-
-            if(!frequencyFound){
-                minFrequency = maxFrequency = 1;
-            }
-
-            minFrequency = (float)Math.log10(minFrequency) - 1;
-            maxFrequency = (float)Math.log10(maxFrequency) + 1;
-
-            this.formattedTransferFunction.setAstatism(astatism);
-            this.formattedTransferFunction.adjustMainFractalVisibility();
-            this.formattedTransferFunction.setGain(gain);
-
             for(int i = 0; i < numeratorParameters.vector.length; i ++){
                 numeratorParameters.vector[i] *= gain;
             }
-            HistoryHelper.add(this.originalTransferFunction);
 
-            this.diagram.setPoints(calculatePoints(astatism, numeratorParameters.vector, denominatorParameters.vector));
             SimplifiedCurve curve = new SimplifiedCurve(astatism, gain);
             for(Complex64F zero : numeratorParameters.roots)
                 curve.split(zero.getMagnitude(), true);
             for(Complex64F pole : denominatorParameters.roots)
                 curve.split(pole.getMagnitude(), false);
-            this.diagram.setSimplifiedPoints(curve.getPoints());
+            SimplifiedCurve.SimplifiedCurvePoint[] simplifiedCurvePoints = curve.getPoints();
+
+            this.formattedTransferFunction.addNumeratorRoots(numeratorParameters.roots);
+            this.formattedTransferFunction.addDenominatorRoots(denominatorParameters.roots);
+            this.formattedTransferFunction.setAstatism(astatism);
+            this.formattedTransferFunction.adjustMainFractalVisibility();
+            this.formattedTransferFunction.setGain(gain);
+
+            HistoryHelper.add(this.originalTransferFunction);
+
+            TFCalculatorInterface calculator = new TFCalculator(astatism, numeratorParameters.vector, denominatorParameters.vector);
+            Point[] exactPoints = calculator.calculatePoints(getFrequencies(simplifiedCurvePoints[0].frequencyLog10,
+                    simplifiedCurvePoints[simplifiedCurvePoints.length - 1].frequencyLog10));
+            this.diagram.setPoints(exactPoints, simplifiedCurvePoints);
         }
     }
 
@@ -171,21 +159,9 @@ public class ResultActivity extends Activity {
             totalCoefficients += realLength - 1;
 
             for (Complex64F root : findRoots(coefficientArray)) {
+                // All roots except 0.
+                // Zero can't ccur.
                 roots.add(root);
-                frequency = (float) root.getMagnitude();
-                if (frequency == 0)
-                    continue;
-                if (frequency < 0)
-                    frequency = -frequency;
-                if (this.frequencyFound) {
-                    if (frequency < minFrequency)
-                        minFrequency = frequency;
-                    if (frequency > maxFrequency)
-                        maxFrequency = frequency;
-                } else {
-                    maxFrequency = minFrequency = frequency;
-                    this.frequencyFound = true;
-                }
             }
         }
 
@@ -217,21 +193,11 @@ public class ResultActivity extends Activity {
         return new PolynomialChainParameters(roots, coefficients, gainChange, astatismChange);
     }
 
-    protected Point[] calculatePoints(int astatism, double[] numeratorVector, double[] denominatorVector){
-        TFCalculatorInterface calculator = new TFCalculator(astatism, numeratorVector, denominatorVector);
-        double[] frequencies = getFrequencies();
-        Point[] points = new Point[frequencies.length];
-        for(int i = 0; i < points.length; i++){
-            points[i] = calculator.calculatePoint(frequencies[i]);
-        }
-        return points;
-    }
-
-    private double[] getFrequencies(){
+    private double[] getFrequencies(double minFrequencyLog10, double maxFrequencyLog10){
         double step = 1/FREQUENCY_DENSITY;
-        int total = (int)((maxFrequency - minFrequency)*FREQUENCY_DENSITY) + 1;
+        int total = (int)((maxFrequencyLog10 - minFrequencyLog10)*FREQUENCY_DENSITY) + 1;
         double[] result = new double[total];
-        double current = minFrequency;
+        double current = minFrequencyLog10;
         for(int i = 0 ; i < total; i++, current += step){
             result[i] = Math.pow(10, current);
         }

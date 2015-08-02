@@ -7,4 +7,5 @@ import org.ejml.data.Complex64F;
  */
 public interface TFCalculatorInterface {
     Point calculatePoint(double frequency);
+    Point[] calculatePoints(double[] frequencies);
 }

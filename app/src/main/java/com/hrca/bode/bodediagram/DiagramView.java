@@ -43,8 +43,8 @@ public class DiagramView extends SurfaceView {
     private float maxFrequency;
     private float minAmplitude;
     private float maxAmplitude;
-    private float minPhase;
-    private float maxPhase;
+    private float minPhase = -270;
+    private float maxPhase = 90;
     private int backgroundColor;
     private final Paint linesPaint;
     private final Paint axisPaint;
@@ -103,44 +103,40 @@ public class DiagramView extends SurfaceView {
         this.textPaint.setTextSize(textSize);
     }
 
-    public void setPoints(Point[] points){
-        if(points == null || points.length == 0) {
-            this.points = null;
+    public void setPoints(Point[] points, SimplifiedCurve.SimplifiedCurvePoint[] simplifiedCurvePoints){
+        this.simplifiedCurvePoints = simplifiedCurvePoints;
+        if(simplifiedCurvePoints == null || simplifiedCurvePoints.length == 0) {
             return;
         }
 
-        this.minFrequency = this.maxFrequency = points[0].frequencyLog10;
-        this.minAmplitude = this.maxAmplitude = points[0].amplitudeDB;
-        this.minPhase = 0;
+        this.minFrequency = this.maxFrequency = simplifiedCurvePoints[0].frequencyLog10;
+        this.minAmplitude = this.maxAmplitude = simplifiedCurvePoints[0].amplitudeDB;
 
-        for(int i = 1; i < points.length; i ++) {
-            if (points[i].frequencyLog10 > this.maxFrequency)
-                this.maxFrequency = points[i].frequencyLog10;
-            if (points[i].frequencyLog10 < this.minFrequency)
-                this.minFrequency = points[i].frequencyLog10;
+        for(int i = 1; i < simplifiedCurvePoints.length; i ++) {
+            if (simplifiedCurvePoints[i].frequencyLog10 > this.maxFrequency)
+                this.maxFrequency = simplifiedCurvePoints[i].frequencyLog10;
+            if (simplifiedCurvePoints[i].frequencyLog10 < this.minFrequency)
+                this.minFrequency = simplifiedCurvePoints[i].frequencyLog10;
 
-            if (points[i].amplitudeDB > this.maxAmplitude)
-                this.maxAmplitude = points[i].amplitudeDB;
-            if (points[i].amplitudeDB < this.minAmplitude)
-                this.minAmplitude = points[i].amplitudeDB;
+            if (simplifiedCurvePoints[i].amplitudeDB > this.maxAmplitude)
+                this.maxAmplitude = simplifiedCurvePoints[i].amplitudeDB;
+            if (simplifiedCurvePoints[i].amplitudeDB < this.minAmplitude)
+                this.minAmplitude = simplifiedCurvePoints[i].amplitudeDB;
         }
 
+        /*
+        this.minPhase = this.maxPhase = 0;
         for(int i = 0; i < points.length; i ++){
             if(points[i].phaseDegree > this.maxPhase)
                 this.maxPhase = points[i].phaseDegree;
             if(points[i].phaseDegree < this.minPhase)
                 this.minPhase = points[i].phaseDegree;
         }
+        */
 
         this.points = points;
-            this.maxAmplitude = ((float)Math.ceil(this.maxAmplitude / AMPLITUDE_STEP_DB)) * AMPLITUDE_STEP_DB;
-            this.minAmplitude = ((float)Math.floor(this.minAmplitude / AMPLITUDE_STEP_DB)) * AMPLITUDE_STEP_DB;
-            this.maxPhase = ((float)Math.ceil(this.maxPhase / PHASE_STEP_DEGREES)) * PHASE_STEP_DEGREES;
-        this.minPhase = ((float)Math.floor(this.minPhase / PHASE_STEP_DEGREES)) * PHASE_STEP_DEGREES;
-    }
-
-    public void setSimplifiedPoints(SimplifiedCurve.SimplifiedCurvePoint[] simplifiedCurvePoints){
-        this.simplifiedCurvePoints = simplifiedCurvePoints;
+        this.maxAmplitude = ((float)Math.ceil(this.maxAmplitude / AMPLITUDE_STEP_DB + 0.5)) * AMPLITUDE_STEP_DB;
+        this.minAmplitude = ((float)Math.floor(this.minAmplitude / AMPLITUDE_STEP_DB - 0.5)) * AMPLITUDE_STEP_DB;
     }
 
     public void redraw(){
@@ -180,7 +176,7 @@ public class DiagramView extends SurfaceView {
         time = end;
         drawAmplitudeHorizontals(canvas);
         end = System.currentTimeMillis();
-        Log.d("Time", "Amplitudne horizontals drawn in " + Long.toString(end - time) + " ms");
+        Log.d("Time", "Amplitude horizontals drawn in " + Long.toString(end - time) + " ms");
         time = end;
         drawAmplitudeAxis(canvas);
         end = System.currentTimeMillis();
@@ -390,7 +386,7 @@ public class DiagramView extends SurfaceView {
     }
 
     private float getX(SimplifiedCurve.SimplifiedCurvePoint point){
-        return getX((float) Math.log10(point.frequency));
+        return getX(point.frequencyLog10);
     }
 
     private float getAmplitudeY(SimplifiedCurve.SimplifiedCurvePoint point){

@@ -52,4 +52,13 @@ public class TFCalculator implements TFCalculatorInterface{
 
         return new Point(amplitude, phase, frequency);
     }
+
+    public Point[] calculatePoints(double[] frequencies){
+        if(frequencies == null)
+            return null;
+        Point[] points = new Point[frequencies.length];
+        for(int i = 0; i < points.length; i ++)
+            points[i] = this.calculatePoint(frequencies[i]);
+        return points;
+    }
 }
