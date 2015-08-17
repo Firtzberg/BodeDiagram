@@ -195,6 +195,7 @@ public class DiagramView extends SurfaceView {
         Log.d("Time", "Phase axises drawn in " + Long.toString(end - time) + " ms");
         time = end;
         drawCurves(canvas, this.points);
+        end = System.currentTimeMillis();
         Log.d("Time", "Curves drawn in " + Long.toString(end - time) + " ms");
         time = end;
         drawSimplifiedCurves(canvas, this.simplifiedCurvePoints);
@@ -205,28 +206,30 @@ public class DiagramView extends SurfaceView {
     }
 
     private void drawSimplifiedCurves(Canvas canvas, SimplifiedCurve.SimplifiedCurvePoint[] simplifiedCurvePoints) {
-        int length = simplifiedCurvePoints.length - 1;
-        float[] pts = new float[4*length];
         int i;
+        float formerX = getX(simplifiedCurvePoints[0]);
+        float formerAmplitudeY = getAmplitudeY(simplifiedCurvePoints[0]);
+        float currentX;
+        float currentAmplitudeY;
 
-        pts[0] = getX(simplifiedCurvePoints[0]);
-        pts[1] = getAmplitudeY(simplifiedCurvePoints[0]);
-        for(i = 1; i < length; i ++){
-            pts[4*i - 2] = pts[4*i + 0] = getX(simplifiedCurvePoints[i]);
-            pts[4*i - 1] = pts[4*i + 1] = getAmplitudeY(simplifiedCurvePoints[i]);
+        for(i = 1; i < simplifiedCurvePoints.length; i ++){
+            currentX = getX(simplifiedCurvePoints[i]);
+            currentAmplitudeY = getAmplitudeY(simplifiedCurvePoints[i]);
+
+            canvas.drawLine(formerX, formerAmplitudeY, currentX, currentAmplitudeY, this.simplifiedCurvePaint);
+
+            formerX = currentX;
+            formerAmplitudeY = currentAmplitudeY;
         }
-        pts[4*i - 2] = getX(simplifiedCurvePoints[i]);
-        pts[4*i - 1] = getAmplitudeY(simplifiedCurvePoints[i]);
-        canvas.drawLines(pts, this.simplifiedCurvePaint);
     }
 
     private void drawAmplitudeHorizontals(Canvas canvas){
         float value;
         float width = getX(this.maxFrequency) - getX(this.minFrequency);
-        float[] pts = new float[4*(int)(width/linesLength/2)];
+        float[] pts = new float[2*(int)(width/linesLength/2)];
 
         value = getX(this.minFrequency);
-        for(int i = 0; i < pts.length; i += 2){
+        for(int i = 0; i < pts.length; i ++){
             pts[i] = value += linesLength;
         }
 
@@ -235,11 +238,9 @@ public class DiagramView extends SurfaceView {
             current += AMPLITUDE_STEP_DB;
         while(current <= this.maxAmplitude) {
             value = getAmplitudeY(current);
-            canvas.drawText(Integer.toString((int)current) + "dB", 10, value + textPaint.getTextSize()/2, textPaint);
-            for(int i = 1; i < pts.length; i += 2){
-                pts[i] = value;
-            }
-            canvas.drawLines(pts, linesPaint);
+            canvas.drawText(Integer.toString((int) current) + "dB", 10, value + textPaint.getTextSize() / 2, textPaint);
+            for(int i = 0; i < pts.length; i ++)
+                canvas.drawLine(pts[i], value, pts[++i], value, this.linesPaint);
             current += AMPLITUDE_STEP_DB;
         }
     }
@@ -247,10 +248,10 @@ public class DiagramView extends SurfaceView {
     private void drawPhaseHorizontals(Canvas canvas){
         float value;
         float width = getX(this.maxFrequency) - getX(this.minFrequency);
-        float[] pts = new float[4*(int)(width/linesLength/2)];
+        float[] pts = new float[2*(int)(width/linesLength/2)];
 
         value = getX(this.minFrequency);
-        for(int i = 0; i < pts.length; i += 2){
+        for(int i = 0; i < pts.length; i ++){
             pts[i] = value += linesLength;
         }
 
@@ -260,10 +261,8 @@ public class DiagramView extends SurfaceView {
         while(current <= this.maxPhase) {
             value = getPhaseY(current);
             canvas.drawText(Integer.toString((int)current) + "°", 10, value + textPaint.getTextSize()/2, textPaint);
-            for(int i = 1; i < pts.length; i += 2){
-                pts[i] = value;
-            }
-            canvas.drawLines(pts, linesPaint);
+            for(int i = 0; i < pts.length; i ++)
+                canvas.drawLine(pts[i], value, pts[++i], value, this.linesPaint);
             current += PHASE_STEP_DEGREES;
         }
     }
@@ -274,10 +273,10 @@ public class DiagramView extends SurfaceView {
         float decadeStart;
         float value;
         float height = getAmplitudeY(this.minAmplitude) - getAmplitudeY(this.maxAmplitude);
-        float[] pts = new float[4*(int)(height/linesLength/2)];
+        float[] pts = new float[2*(int)(height/linesLength/2)];
 
         value = getAmplitudeY(this.maxAmplitude);
-        for(int i = 1; i < pts.length; i += 2)
+        for(int i = 0; i < pts.length; i ++)
             pts[i] = value += linesLength;
 
         for(float decimal : decimals){
@@ -289,10 +288,8 @@ public class DiagramView extends SurfaceView {
                 if(decimal == 0){
                     canvas.drawText("10^" + (int)decadeStart, value - 12, getAmplitudeY(this.minAmplitude) + textPaint.getTextSize(), textPaint);
                 }
-                for(int i = 0; i < pts.length; i += 2){
-                    pts[i] = value;
-                }
-                canvas.drawLines(pts, this.linesPaint);
+                for(int i = 0; i < pts.length; i ++)
+                    canvas.drawLine(value, pts[i], value, pts[++i], this.linesPaint);
                 decadeStart++;
             }
         }
@@ -304,10 +301,10 @@ public class DiagramView extends SurfaceView {
         float decadeStart;
         float value;
         float height = getPhaseY(this.minPhase) - getPhaseY(this.maxPhase);
-        float[] pts = new float[4*(int)(height/linesLength/2)];
+        float[] pts = new float[2*(int)(height/linesLength/2)];
 
         value = getPhaseY(this.maxPhase);
-        for(int i = 1; i < pts.length; i += 2)
+        for(int i = 0; i < pts.length; i ++)
             pts[i] = value += linesLength;
 
         for(float decimal : decimals){
@@ -319,10 +316,8 @@ public class DiagramView extends SurfaceView {
                 if(decimal == 0){
                     canvas.drawText("10^" + (int)decadeStart, value - 12, getPhaseY(0) + textPaint.getTextSize(), textPaint);
                 }
-                for(int i = 0; i < pts.length; i += 2){
-                    pts[i] = value;
-                }
-                canvas.drawLines(pts, this.linesPaint);
+                for(int i = 0; i < pts.length; i ++)
+                    canvas.drawLine(value, pts[i], value, pts[++i], this.linesPaint);
                 decadeStart++;
             }
         }
@@ -339,26 +334,26 @@ public class DiagramView extends SurfaceView {
     }
 
     private void drawCurves(Canvas canvas, Point[] points){
-        int length = points.length - 1;
-        float[] pts = new float[4*length];
         int i;
+        float formerX = getX(points[0]);
+        float formerAmplitudeY = getAmplitudeY(points[0]);
+        float formerPhaseY = getPhaseY(points[0]);
+        float currentX;
+        float currentAmplitudeY;
+        float currentPhaseY;
 
-        pts[0] = getX(points[0]);
-        pts[1] = getAmplitudeY(points[0]);
-        for(i = 1; i < length; i ++){
-            pts[4*i - 2] = pts[4*i + 0] = getX(points[i]);
-            pts[4*i - 1] = pts[4*i + 1] = getAmplitudeY(points[i]);
-        }
-        pts[4*i - 2] = getX(points[i]);
-        pts[4*i - 1] = getAmplitudeY(points[i]);
-        canvas.drawLines(pts, this.curvePaint);
+        for(i = 1; i < points.length; i ++){
+            currentX = getX(points[i]);
+            currentAmplitudeY = getAmplitudeY(points[i]);
+            currentPhaseY = getPhaseY(points[i]);
 
-        pts[1] = getPhaseY(points[0]);
-        for(i = 1; i < length; i ++){
-            pts[4*i - 1] = pts[4*i + 1] = getPhaseY(points[i]);
+            canvas.drawLine(formerX, formerAmplitudeY, currentX, currentAmplitudeY, this.curvePaint);
+            canvas.drawLine(formerX, formerPhaseY, currentX, currentPhaseY, this.curvePaint);
+
+            formerX = currentX;
+            formerAmplitudeY = currentAmplitudeY;
+            formerPhaseY = currentPhaseY;
         }
-        pts[4*i - 1] = getPhaseY(points[i]);
-        canvas.drawLines(pts, this.curvePaint);
     }
 
     private float getX(float frequencyLog10){
