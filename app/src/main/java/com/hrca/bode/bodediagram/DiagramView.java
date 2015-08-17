@@ -172,7 +172,7 @@ public class DiagramView extends SurfaceView {
         canvas.drawColor(backgroundColor);
         drawAmplitudeVerticals(canvas);
         end = System.currentTimeMillis();
-        Log.d("Time", "Amplitudn verticals drawn in " + Long.toString(end - time) + " ms");
+        Log.d("Time", "Amplitude verticals drawn in " + Long.toString(end - time) + " ms");
         time = end;
         drawAmplitudeHorizontals(canvas);
         end = System.currentTimeMillis();
@@ -182,13 +182,13 @@ public class DiagramView extends SurfaceView {
         end = System.currentTimeMillis();
         Log.d("Time", "Amplitude axises drawn in " + Long.toString(end - time) + " ms");
         time = end;
-        drawPhaseHorizontals(canvas);
-        end = System.currentTimeMillis();
-        Log.d("Time", "Phase horzontals drawn in " + Long.toString(end - time) + " ms");
-        time = end;
         drawPhaseVerticals(canvas);
         end = System.currentTimeMillis();
         Log.d("Time", "Phase verticals drawn in " + Long.toString(end - time) + " ms");
+        time = end;
+        drawPhaseHorizontals(canvas);
+        end = System.currentTimeMillis();
+        Log.d("Time", "Phase horizontals drawn in " + Long.toString(end - time) + " ms");
         time = end;
         drawPhaseAxis(canvas);
         end = System.currentTimeMillis();
@@ -347,13 +347,36 @@ public class DiagramView extends SurfaceView {
             currentAmplitudeY = getAmplitudeY(points[i]);
             currentPhaseY = getPhaseY(points[i]);
 
-            canvas.drawLine(formerX, formerAmplitudeY, currentX, currentAmplitudeY, this.curvePaint);
+            drawLine(canvas, formerX, formerAmplitudeY, currentX, currentAmplitudeY);
             canvas.drawLine(formerX, formerPhaseY, currentX, currentPhaseY, this.curvePaint);
 
             formerX = currentX;
             formerAmplitudeY = currentAmplitudeY;
             formerPhaseY = currentPhaseY;
         }
+    }
+
+    private void drawLine(Canvas canvas, float startX, float startY, float endX, float endY){
+        if(startY < PIXELS_TOP_PADDING){
+            if(endY <= PIXELS_TOP_PADDING)
+                return;
+            float ratio = (startY - endY)/(startY - PIXELS_TOP_PADDING);
+            startY = PIXELS_TOP_PADDING;
+            startX = startX + (endX - startX)*ratio;
+        }
+        float bottom = getAmplitudeY(this.minAmplitude);
+        if(startY > bottom){
+            if(endY >= bottom)
+                return;
+            float ratio = (startY - endY)/(startY - bottom);
+            startY = bottom;
+            startX = startX + (endX - startX)*ratio;
+        }
+        if(endY < PIXELS_TOP_PADDING || endY > bottom){
+            drawLine(canvas, endX, endY, startX, startY);
+            return;
+        }
+        canvas.drawLine(startX, startY, endX, endY, this.curvePaint);
     }
 
     private float getX(float frequencyLog10){
