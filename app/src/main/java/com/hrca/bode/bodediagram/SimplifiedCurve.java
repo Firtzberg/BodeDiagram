@@ -9,16 +9,6 @@ public class SimplifiedCurve {
 
     public static final double FREQUENCY_LOG_EXPANSION = 1.0;
 
-    public class SimplifiedCurvePoint{
-        public final float frequencyLog10;
-        public final float amplitudeDB;
-
-        public SimplifiedCurvePoint(double frequencyLog10, double amplitudeDB){
-            this.frequencyLog10 = (float)frequencyLog10;
-            this.amplitudeDB = (float)amplitudeDB;
-        }
-    }
-
     public class SimplifiedCurvePart{
         int gradientCoefficient;
         public final double startLog10;
@@ -77,14 +67,14 @@ public class SimplifiedCurve {
         }
         double f = parts.get(i - 1).startLog10;
         if(f == Double.NEGATIVE_INFINITY)
-            f = 1;
+            f = 0;
         f += FREQUENCY_LOG_EXPANSION;
         SimplifiedCurvePart last = new SimplifiedCurvePart(f, parts.get(i - 1).gradientCoefficient);
         points[i] = last.calculatePoint(parts.get(i - 1), k);
         k = K;
         if(parts.size() > 1)
             f = parts.get(1).startLog10;
-        else f = 1;
+        else f = 0;
         f -= FREQUENCY_LOG_EXPANSION;
         SimplifiedCurvePart first = new SimplifiedCurvePart(f, parts.get(0).gradientCoefficient);
         points[0] = first.calculatePoint(parts.get(0), k);

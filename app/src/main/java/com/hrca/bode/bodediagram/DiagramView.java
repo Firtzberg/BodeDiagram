@@ -38,7 +38,7 @@ public class DiagramView extends SurfaceView {
     private static final float SIZE_DEFAULT_TEXT = 12 * Resources.getSystem().getDisplayMetrics().scaledDensity;
     private static final float RELATIVE_CURVE_THICKNESS = 1.5F;
     private Point[] points;
-    private SimplifiedCurve.SimplifiedCurvePoint[] simplifiedCurvePoints;
+    private SimplifiedCurvePoint[] simplifiedCurvePoints;
     private float minFrequency;
     private float maxFrequency;
     private float minAmplitude;
@@ -103,7 +103,7 @@ public class DiagramView extends SurfaceView {
         this.textPaint.setTextSize(textSize);
     }
 
-    public void setPoints(Point[] points, SimplifiedCurve.SimplifiedCurvePoint[] simplifiedCurvePoints){
+    public void setPoints(Point[] points, SimplifiedCurvePoint[] simplifiedCurvePoints){
         this.simplifiedCurvePoints = simplifiedCurvePoints;
         if(simplifiedCurvePoints == null || simplifiedCurvePoints.length == 0) {
             return;
@@ -153,7 +153,7 @@ public class DiagramView extends SurfaceView {
         this.getLayoutParams().width = (int)getX(this.maxFrequency) + (int)PIXELS_RIGHT_PADDING;
         parent.getLayoutParams().height = (int)getPhaseY(this.minPhase) + (int)PIXELS_BOTTOM_PADDING;
         parent.getLayoutParams().width = (int)getX(this.maxFrequency) + (int)PIXELS_RIGHT_PADDING;
-        parent.requestLayout();
+        //parent.requestLayout();
         SurfaceHolder sh = this.getHolder();
         Canvas canvas;
         Log.d("Meanwhile", "Waiting for canvas");
@@ -205,7 +205,7 @@ public class DiagramView extends SurfaceView {
         sh.unlockCanvasAndPost(canvas);
     }
 
-    private void drawSimplifiedCurves(Canvas canvas, SimplifiedCurve.SimplifiedCurvePoint[] simplifiedCurvePoints) {
+    private void drawSimplifiedCurves(Canvas canvas, SimplifiedCurvePoint[] simplifiedCurvePoints) {
         int i;
         float formerX = getX(simplifiedCurvePoints[0]);
         float formerAmplitudeY = getAmplitudeY(simplifiedCurvePoints[0]);
@@ -403,11 +403,11 @@ public class DiagramView extends SurfaceView {
         return getPhaseY(point.phaseDegree);
     }
 
-    private float getX(SimplifiedCurve.SimplifiedCurvePoint point){
+    private float getX(SimplifiedCurvePoint point){
         return getX(point.frequencyLog10);
     }
 
-    private float getAmplitudeY(SimplifiedCurve.SimplifiedCurvePoint point){
+    private float getAmplitudeY(SimplifiedCurvePoint point){
         return getAmplitudeY(point.amplitudeDB);
     }
 }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.view.View;
 
 import com.hrca.bode.customs.HistoryHelper;
 import com.hrca.bode.customs.displaycustoms.TransferFunctionView;
@@ -16,11 +17,14 @@ import org.ejml.interfaces.decomposition.EigenDecomposition;
 import java.util.ArrayList;
 
 public class ResultActivity extends Activity {
+    public static final String EXTRA_COORDINATES = "coordinates";
+    public static final int REQUEST_CODE_COORDINATES = 672;
     public static final String PARCELABLE_FORMATTED_TF = "formattedTF";
     public static final String PARCELABLE_ORIGINAL_TF = "originalTF";
     private static final double FREQUENCY_DENSITY = 20;
     protected TransferFunctionView originalTransferFunction;
     protected TransferFunctionView formattedTransferFunction;
+    protected SimplifiedCurvePoint[] simplifiedCurvePoints;
     protected DiagramView diagram;
 
     private class PolynomialChainParameters{
@@ -85,7 +89,7 @@ public class ResultActivity extends Activity {
                 curve.split(zero.getMagnitude(), true);
             for(Complex64F pole : denominatorParameters.roots)
                 curve.split(pole.getMagnitude(), false);
-            SimplifiedCurve.SimplifiedCurvePoint[] simplifiedCurvePoints = curve.getPoints();
+            simplifiedCurvePoints = curve.getPoints();
 
             this.formattedTransferFunction.addNumeratorRoots(numeratorParameters.roots);
             this.formattedTransferFunction.addDenominatorRoots(denominatorParameters.roots);
@@ -113,6 +117,17 @@ public class ResultActivity extends Activity {
         }).start();
     }
 
+    public void showCoordinates(View view) {
+        Intent intent = new Intent(this, CoordinatesActivity.class);
+        float[] coordinates = new float[2 * simplifiedCurvePoints.length];
+        for(int i = 0; i < simplifiedCurvePoints.length; i ++){
+            coordinates[2*i] = simplifiedCurvePoints[i].frequencyLog10;
+            coordinates[2*i + 1] = simplifiedCurvePoints[i].amplitudeDB;
+        }
+        intent.putExtra(EXTRA_COORDINATES, coordinates);
+        startActivityForResult(intent, REQUEST_CODE_COORDINATES);
+    }
+
     private void finishWithError(int messageIdentifier){
         Intent myIntent = new Intent();
         myIntent.putExtra(InputActivity.EXTRA_DISPLAY_ERROR_MESSAGE_R_ID, messageIdentifier);
@@ -125,7 +140,6 @@ public class ResultActivity extends Activity {
         double[] Tmp;
         double[] coefficients;
         int totalCoefficients = 1;
-        double frequency;
         int astatismChange = 0;
         double gainChange = 1;
         int firstNonZero;
@@ -160,7 +174,7 @@ public class ResultActivity extends Activity {
 
             for (Complex64F root : findRoots(coefficientArray)) {
                 // All roots except 0.
-                // Zero can't ccur.
+                // Zero can't occur.
                 roots.add(root);
             }
         }

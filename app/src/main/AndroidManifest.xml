@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hrca.bode.bodediagram"
-    android:installLocation="auto">
+    android:installLocation="auto" >
 
     <application
         android:allowBackup="true"
@@ -23,11 +23,15 @@
         </activity>
         <activity
             android:name=".PolynomialActivity"
-            android:label="@string/title_activity_polinomial" >
+            android:label="@string/title_activity_polynomial" >
         </activity>
         <activity
             android:name=".ResultActivity"
             android:label="@string/title_activity_result" >
+        </activity>
+        <activity
+            android:name=".CoordinatesActivity"
+            android:label="@string/title_activity_coordinates" >
         </activity>
     </application>
 
