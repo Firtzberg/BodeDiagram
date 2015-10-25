@@ -198,9 +198,10 @@ public class PolynomialChainView extends LinearLayout {
             PolynomialView polynomialView = PolynomialView.getUnused(getContext());
             polynomialView.onRestoreInstanceState(polynomialState);
             this.add(polynomialView);
-            return;
         }
-        this.list.get(identifier).onRestoreInstanceState(polynomialState);
+        else {
+            this.list.get(identifier).onRestoreInstanceState(polynomialState);
+        }
     }
 
     public int size(){

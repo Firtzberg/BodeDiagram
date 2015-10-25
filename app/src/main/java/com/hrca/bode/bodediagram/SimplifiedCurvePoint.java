@@ -8,7 +8,15 @@ public class SimplifiedCurvePoint{
     public final float amplitudeDB;
 
     public SimplifiedCurvePoint(double frequencyLog10, double amplitudeDB){
-        this.frequencyLog10 = (float)frequencyLog10;
-        this.amplitudeDB = (float)amplitudeDB;
+        float tmp = (float)frequencyLog10;
+        if(Math.abs(Math.round(tmp) - tmp) < 0.02){
+            tmp = Math.round(tmp);
+        }
+        this.frequencyLog10 =tmp;
+        tmp = (float)amplitudeDB;
+        if(Math.abs(Math.round(tmp) - tmp) < 0.02){
+            tmp = Math.round(tmp);
+        }
+        this.amplitudeDB = tmp;
     }
 }

@@ -27,7 +27,7 @@ public class CoordinatesActivity extends Activity {
             this.coordinates = new ArrayList<SimplifiedCurvePoint>(lenght);
             for(int i = 0; i < lenght; i ++){
                 this.coordinates.add(
-                        new SimplifiedCurvePoint(((coordinatesArray[2 * i]+1)-1),
+                        new SimplifiedCurvePoint(coordinatesArray[2 * i],
                                 coordinatesArray[2 * i + 1]));
             }
             this.coordinatesList.setAdapter(new CoordinateAdapter(this, this.coordinates));

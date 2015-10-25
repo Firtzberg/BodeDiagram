@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
  */
 public class CoordinateAdapter extends BaseAdapter{
     private LinearLayout.LayoutParams textViewParams;
-    private LinearLayout.LayoutParams linearLayoutParams;
+    private ListView.LayoutParams linearLayoutParams;
     private Context context;
     private final ArrayList<SimplifiedCurvePoint> coordinates;
 
@@ -27,8 +28,17 @@ public class CoordinateAdapter extends BaseAdapter{
         textViewParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
         textViewParams.weight = 1;
 
-        this.linearLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+        this.linearLayoutParams = new ListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    private String valueToString(float value){
+        if(value == (int)value){
+            return Integer.toString((int)value);
+        }
+        else {
+            return Float.toString(value);
+        }
     }
 
     @Override
@@ -75,8 +85,8 @@ public class CoordinateAdapter extends BaseAdapter{
         }
         convertView.setBackgroundColor(position%2 == 1? Color.TRANSPARENT: Color.LTGRAY);
         ((TextView)convertView.findViewById(1)).setText(Integer.toString(position+1));
-        ((TextView)convertView.findViewById(2)).setText("10^"+this.coordinates.get(position).frequencyLog10);
-        ((TextView)convertView.findViewById(3)).setText(this.coordinates.get(position).amplitudeDB + "dB");
+        ((TextView)convertView.findViewById(2)).setText("10^" + this.valueToString(this.coordinates.get(position).frequencyLog10));
+        ((TextView)convertView.findViewById(3)).setText(this.valueToString(this.coordinates.get(position).amplitudeDB) + "dB");
         return convertView;
     }
 }
