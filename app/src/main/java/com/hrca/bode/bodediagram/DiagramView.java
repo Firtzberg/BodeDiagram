@@ -360,7 +360,7 @@ public class DiagramView extends SurfaceView {
         if(startY < PIXELS_TOP_PADDING){
             if(endY <= PIXELS_TOP_PADDING)
                 return;
-            float ratio = (startY - endY)/(startY - PIXELS_TOP_PADDING);
+            float ratio = (endY - PIXELS_TOP_PADDING)/(endY - startY);
             startY = PIXELS_TOP_PADDING;
             startX = startX + (endX - startX)*ratio;
         }
@@ -368,7 +368,7 @@ public class DiagramView extends SurfaceView {
         if(startY > bottom){
             if(endY >= bottom)
                 return;
-            float ratio = (startY - endY)/(startY - bottom);
+            float ratio = (bottom - endY)/(startY - endY);
             startY = bottom;
             startX = startX + (endX - startX)*ratio;
         }

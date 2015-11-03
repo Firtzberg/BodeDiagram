@@ -31,7 +31,7 @@ public class SimplifiedCurve {
     private final ArrayList<SimplifiedCurvePart> parts;
 
     public SimplifiedCurve(int astatism, double gain){
-        K = 20*Math.log10(gain);
+        K = 20*Math.log10(Math.abs(gain));
         parts = new ArrayList<>();
         SimplifiedCurvePart specter = new SimplifiedCurvePart(Double.NEGATIVE_INFINITY, astatism);
         parts.add(specter);
