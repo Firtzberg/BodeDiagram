@@ -16,6 +16,9 @@ import org.ejml.interfaces.decomposition.EigenDecomposition;
 
 import java.util.ArrayList;
 
+import fr.nicolaspomepuy.discreetapprate.AppRate;
+import fr.nicolaspomepuy.discreetapprate.RetryPolicy;
+
 public class ResultActivity extends Activity {
     public static final String EXTRA_COORDINATES = "coordinates";
     public static final int REQUEST_CODE_COORDINATES = 672;
@@ -103,6 +106,12 @@ public class ResultActivity extends Activity {
             Point[] exactPoints = calculator.calculatePoints(getFrequencies(simplifiedCurvePoints[0].frequencyLog10,
                     simplifiedCurvePoints[simplifiedCurvePoints.length - 1].frequencyLog10));
             this.diagram.setPoints(exactPoints, simplifiedCurvePoints);
+
+            AppRate.with(this)
+                    .initialLaunchCount(5)
+                    .retryPolicy(RetryPolicy.INCREMENTAL)
+                    .installedSince(0)
+                    .checkAndShow();
         }
     }
 
