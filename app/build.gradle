@@ -8,8 +8,8 @@ android {
         applicationId "com.hrca.bode.bodediagram"
         minSdkVersion 8
         targetSdkVersion 23
-        versionCode 9
-        versionName "2.2"
+        versionCode 10
+        versionName "2.3"
     }
     buildTypes {
         release {
